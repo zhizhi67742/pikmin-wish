@@ -1373,3 +1373,138 @@ label textarea {
     white-space: nowrap;
   }
 }
+
+
+/* ===== PikminWish v1.0.1 final fixes ===== */
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 22px 12px 34px;
+  color: rgba(255,255,255,0.76);
+  line-height: 1.7;
+}
+
+.dex-header-panel .hint {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.dex-table .confirm-btn {
+  border-radius: 14px !important;
+  min-width: 44px;
+  padding: 8px 10px !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  body { padding: 0 !important; }
+
+  .container {
+    width: min(100% - 14px, 1100px) !important;
+    padding: 0 0 54px !important;
+  }
+
+  .panel,
+  .dex-header-panel,
+  .dex-search-panel,
+  .dex-item {
+    border-radius: 18px !important;
+  }
+
+  .dex-header-panel {
+    padding: 15px 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .dex-header-row { gap: 12px !important; }
+
+  .limit-settings {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+  }
+
+  .limit-settings input {
+    width: 100% !important;
+    height: 34px !important;
+    padding: 4px 8px !important;
+    font-size: 13px !important;
+  }
+
+  .dex-search-panel { padding: 8px !important; }
+
+  .dex-title {
+    font-size: 16px !important;
+    padding: 12px 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  .dex-content {
+    padding: 8px 5px !important;
+    overflow-x: hidden !important;
+  }
+
+  .dex-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .dex-table th,
+  .dex-table td {
+    padding: 5px 1px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  .dex-table th:nth-child(1), .dex-table td:nth-child(1) { width: 15%; }
+  .dex-table th:nth-child(2), .dex-table td:nth-child(2) { width: 23%; }
+  .dex-table th:nth-child(3), .dex-table td:nth-child(3) { width: 23%; }
+  .dex-table th:nth-child(4), .dex-table td:nth-child(4) { width: 17%; }
+  .dex-table th:nth-child(5), .dex-table td:nth-child(5) { width: 22%; }
+
+  .dex-input-line {
+    gap: 2px !important;
+    justify-content: center !important;
+  }
+
+  .dex-input-line input,
+  .dex-table input {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 28px !important;
+    padding: 1px 2px !important;
+    font-size: 12px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+  }
+
+  .dex-input-line span {
+    font-size: 10px !important;
+    transform: scale(.9);
+    transform-origin: left center;
+  }
+
+  .dex-table .confirm-btn {
+    width: auto !important;
+    min-width: 34px !important;
+    height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 11px !important;
+    border-radius: 12px !important;
+  }
+
+  .status-full,
+  .status-low { font-size: 11px !important; }
+
+  .flower-subtitle {
+    display: block !important;
+    margin: 3px 0 0 !important;
+  }
+}

@@ -720,6 +720,10 @@ function renderDex() {
     return;
   }
 
+  const openedFlowerNames = Array.from(document.querySelectorAll(".dex-item.open .dex-title"))
+    .map(function (btn) { return (btn.dataset.flowerName || "").trim(); })
+    .filter(Boolean);
+
   filteredDex.forEach(function (flower, index) {
     let rows = "";
 
@@ -742,7 +746,7 @@ function renderDex() {
                 max="${essenceLimit}"
                 value="${essence}"
                 oninput="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false)"
-                onchange="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, true)"
+                onchange="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false)"
               />
               <span>/ ${essenceLimit}</span>
             </div>
@@ -756,7 +760,7 @@ function renderDex() {
                 max="${petalLimit}"
                 value="${petal}"
                 oninput="saveDexValue('${petalKey}', this.value, ${petalLimit}, false)"
-                onchange="saveDexValue('${petalKey}', this.value, ${petalLimit}, true)"
+                onchange="saveDexValue('${petalKey}', this.value, ${petalLimit}, false)"
               />
               <span>/ ${petalLimit}</span>
             </div>
@@ -774,8 +778,8 @@ function renderDex() {
     const subtitle = flower.subtitle ? `<span class="flower-subtitle">（${escapeHtml(flower.subtitle)}）</span>` : "";
 
     list.innerHTML += `
-      <div class="dex-item ${index === 0 ? "open" : ""}">
-        <button class="dex-title" onclick="toggleDex(this)">🌼 ${escapeHtml(flower.name)}${subtitle} ▼</button>
+      <div class="dex-item ${(openedFlowerNames.length ? openedFlowerNames.includes(flower.name) : index === 0) ? "open" : ""}">
+        <button class="dex-title" data-flower-name="${escapeHtml(flower.name)}" onclick="toggleDex(this)">🌼 ${escapeHtml(flower.name)}${subtitle} ▼</button>
         <div class="dex-content">
           <table class="dex-table">
             <thead>
