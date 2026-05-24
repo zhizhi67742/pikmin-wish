@@ -1606,3 +1606,6 @@ label textarea {
     grid-template-columns: 1fr !important;
   }
 }
+
+.dex-jump-tip{white-space:nowrap;font-size:14px;}
+@media (max-width:480px){.dex-jump-tip{font-size:12px;letter-spacing:-0.2px;}}
