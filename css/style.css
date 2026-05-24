@@ -1340,42 +1340,43 @@ label textarea {
   }
 }
 
-
-/* ===== v1.0.1 Flower Dex continuous input + mobile overlap fix ===== */
-.dex-content {
-  overflow-x: hidden !important;
-}
-
+/* ===== v1.0.1 REAL FIX: mobile flower dex layout + no overlap ===== */
 .dex-table {
-  table-layout: fixed !important;
   width: 100% !important;
   min-width: 0 !important;
+  table-layout: fixed !important;
 }
 
 .dex-table th,
 .dex-table td {
-  overflow: hidden !important;
-  text-overflow: ellipsis;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: clip;
 }
-
-.dex-table th:nth-child(1), .dex-table td:nth-child(1) { width: 15%; }
-.dex-table th:nth-child(2), .dex-table td:nth-child(2) { width: 23%; }
-.dex-table th:nth-child(3), .dex-table td:nth-child(3) { width: 23%; }
-.dex-table th:nth-child(4), .dex-table td:nth-child(4) { width: 19%; }
-.dex-table th:nth-child(5), .dex-table td:nth-child(5) { width: 20%; }
 
 .dex-input-line {
-  max-width: 100%;
+  width: 100%;
   min-width: 0;
+  justify-content: center;
 }
 
-.dex-input-line input,
-.dex-table input {
+.dex-input-line input {
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
-  #dex {
+  #dex.panel,
+  #dex .panel,
+  .dex-header-panel,
+  .dex-search-panel,
+  .dex-list,
+  .dex-item {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .page-section,
+  .panel {
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
@@ -1384,77 +1385,153 @@ label textarea {
     padding: 16px 14px !important;
   }
 
-  .dex-search-panel input {
-    padding: 12px 14px !important;
-    font-size: 14px !important;
+  .dex-header-row {
+    gap: 10px !important;
+  }
+
+  .limit-settings {
+    width: 100% !important;
+    margin-right: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .limit-settings label {
+    font-size: 12px !important;
+  }
+
+  .limit-settings input {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 6px 8px !important;
+    font-size: 15px !important;
   }
 
   .dex-content {
-    padding: 8px 5px !important;
+    padding: 6px 3px !important;
+    overflow-x: hidden !important;
+  }
+
+  .dex-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-spacing: 0 !important;
   }
 
   .dex-table th,
   .dex-table td {
-    padding: 7px 2px !important;
-    font-size: 12px !important;
-    white-space: normal !important;
-    line-height: 1.25 !important;
+    padding: 6px 2px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
     text-align: center !important;
+    white-space: nowrap !important;
     vertical-align: middle !important;
   }
 
-  .dex-table th {
-    font-size: 11px !important;
-  }
+  .dex-table th:nth-child(1),
+  .dex-table td:nth-child(1) { width: 15% !important; }
 
-  .dex-table th:nth-child(1), .dex-table td:nth-child(1) { width: 14%; }
-  .dex-table th:nth-child(2), .dex-table td:nth-child(2) { width: 23%; }
-  .dex-table th:nth-child(3), .dex-table td:nth-child(3) { width: 23%; }
-  .dex-table th:nth-child(4), .dex-table td:nth-child(4) { width: 18%; }
-  .dex-table th:nth-child(5), .dex-table td:nth-child(5) { width: 22%; }
+  .dex-table th:nth-child(2),
+  .dex-table td:nth-child(2),
+  .dex-table th:nth-child(3),
+  .dex-table td:nth-child(3) { width: 25% !important; }
+
+  .dex-table th:nth-child(4),
+  .dex-table td:nth-child(4) { width: 18% !important; }
+
+  .dex-table th:nth-child(5),
+  .dex-table td:nth-child(5) { width: 17% !important; }
 
   .dex-input-line {
-    gap: 2px !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
-    flex-wrap: nowrap !important;
+    gap: 2px !important;
     white-space: nowrap !important;
   }
 
   .dex-input-line input,
   .dex-table input {
-    width: 42px !important;
-    min-width: 42px !important;
-    max-width: 42px !important;
-    height: 34px !important;
-    padding: 4px 2px !important;
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 32px !important;
+    padding: 0 2px !important;
     font-size: 13px !important;
-    border-radius: 16px !important;
+    line-height: 32px !important;
     text-align: center !important;
+    border-radius: 12px !important;
   }
 
   .dex-input-line span {
+    flex: 0 0 auto !important;
     font-size: 10px !important;
-    letter-spacing: -0.04em;
+    line-height: 1 !important;
+    opacity: .82 !important;
+  }
+
+  .confirm-btn,
+  .dex-table .confirm-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    line-height: 30px !important;
+    border-radius: 12px !important;
+    white-space: nowrap !important;
   }
 
   .status-full,
   .status-low,
-  .dex-status-cell {
-    font-size: 11px !important;
+  .dex-table td:nth-child(4) {
+    font-size: 10px !important;
     white-space: normal !important;
-    word-break: keep-all;
+    word-break: keep-all !important;
   }
 
-  .confirm-btn {
-    min-width: 0 !important;
-    width: 100% !important;
-    max-width: 62px !important;
-    height: auto !important;
-    min-height: 32px !important;
-    padding: 6px 3px !important;
-    font-size: 11px !important;
-    line-height: 1.15 !important;
-    border-radius: 16px !important;
+  .dex-title {
+    padding: 12px 14px !important;
+    font-size: 16px !important;
     white-space: normal !important;
+    line-height: 1.35 !important;
+  }
+
+  .flower-subtitle {
+    display: inline !important;
+    margin-left: 3px !important;
+    font-size: 10px !important;
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .page-section,
+  .panel {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .dex-table th,
+  .dex-table td {
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    font-size: 10px !important;
+  }
+
+  .dex-input-line input,
+  .dex-table input {
+    flex-basis: 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    font-size: 12px !important;
+  }
+
+  .dex-input-line span {
+    font-size: 9px !important;
   }
 }
