@@ -741,8 +741,8 @@ function renderDex() {
                 min="0"
                 max="${essenceLimit}"
                 value="${essence}"
-                oninput="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false, this)"
-                onchange="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false, this)"
+                oninput="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false)"
+                onchange="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, true)"
               />
               <span>/ ${essenceLimit}</span>
             </div>
@@ -755,8 +755,8 @@ function renderDex() {
                 min="0"
                 max="${petalLimit}"
                 value="${petal}"
-                oninput="saveDexValue('${petalKey}', this.value, ${petalLimit}, false, this)"
-                onchange="saveDexValue('${petalKey}', this.value, ${petalLimit}, false, this)"
+                oninput="saveDexValue('${petalKey}', this.value, ${petalLimit}, false)"
+                onchange="saveDexValue('${petalKey}', this.value, ${petalLimit}, true)"
               />
               <span>/ ${petalLimit}</span>
             </div>
@@ -765,7 +765,7 @@ function renderDex() {
           <td>${getDexStatus(essence, petal)}</td>
 
           <td>
-            <button class="confirm-btn" onclick="wishFromDex('${flower.name}', '${color}')">缺</button>
+            <button class="confirm-btn" onclick="wishFromDex('${flower.name}', '${color}')">我缺這個</button>
           </td>
         </tr>
       `;
@@ -784,7 +784,7 @@ function renderDex() {
                 <th>精華</th>
                 <th>花瓣</th>
                 <th>狀態</th>
-                <th>許願</th>
+                <th>快速許願</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -799,7 +799,7 @@ function toggleDex(btn) {
   btn.parentElement.classList.toggle("open");
 }
 
-function saveDexValue(key, value, limit, shouldRender, inputEl) {
+function saveDexValue(key, value, limit, shouldRender) {
   let number = Number(value);
 
   if (Number.isNaN(number)) number = 0;
@@ -810,31 +810,8 @@ function saveDexValue(key, value, limit, shouldRender, inputEl) {
   safeSetLocalStorage(key, String(number));
   saveDexBackupValue(key, number);
 
-  // v1.0.1：連續輸入不中斷。
-  // 不在每次 input/change 後重畫整個圖鑑，避免手機鍵盤或展開選單被關閉。
-  if (inputEl) {
-    inputEl.value = String(number);
-    updateDexRowStatus(inputEl);
-  }
-
-  if (shouldRender === true) {
+  if (shouldRender !== false) {
     renderDex();
-  }
-}
-
-function updateDexRowStatus(inputEl) {
-  const row = inputEl.closest("tr");
-  if (!row) return;
-
-  const inputs = row.querySelectorAll("input");
-  if (inputs.length < 2) return;
-
-  const essence = Number(inputs[0].value || 0);
-  const petal = Number(inputs[1].value || 0);
-  const statusCell = row.querySelector("td:nth-child(4)");
-
-  if (statusCell) {
-    statusCell.innerHTML = getDexStatus(essence, petal);
   }
 }
 
