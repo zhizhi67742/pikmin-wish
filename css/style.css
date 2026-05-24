@@ -1341,5 +1341,35 @@ label textarea {
 }
 
 
-.dex-tip{margin-top:6px;font-size:14px;color:#ffd95a;font-weight:600;}
-@media(max-width:768px){.dex-tip{font-size:12px;line-height:1.4;}}
+@media (max-width: 768px) {
+  .dex-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .dex-table th,
+  .dex-table td {
+    padding: 4px 2px;
+    font-size: 12px;
+    overflow: hidden;
+  }
+
+  .dex-table input,
+  .dex-input,
+  .dex-input-line input {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 28px;
+    padding: 2px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .wish-btn,
+  .need-btn {
+    padding: 3px 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
