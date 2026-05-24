@@ -741,8 +741,8 @@ function renderDex() {
                 min="0"
                 max="${essenceLimit}"
                 value="${essence}"
-                oninput="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, false)"
-                onchange="saveDexValue('${essenceKey}', this.value, ${essenceLimit}, true)"
+                oninput="saveDexInput(this, '${essenceKey}', ${essenceLimit})"
+                onchange="saveDexInput(this, '${essenceKey}', ${essenceLimit})"
               />
               <span>/ ${essenceLimit}</span>
             </div>
@@ -755,14 +755,14 @@ function renderDex() {
                 min="0"
                 max="${petalLimit}"
                 value="${petal}"
-                oninput="saveDexValue('${petalKey}', this.value, ${petalLimit}, false)"
-                onchange="saveDexValue('${petalKey}', this.value, ${petalLimit}, true)"
+                oninput="saveDexInput(this, '${petalKey}', ${petalLimit})"
+                onchange="saveDexInput(this, '${petalKey}', ${petalLimit})"
               />
               <span>/ ${petalLimit}</span>
             </div>
           </td>
 
-          <td>${getDexStatus(essence, petal)}</td>
+          <td class="dex-status-cell">${getDexStatus(essence, petal)}</td>
 
           <td>
             <button class="confirm-btn" onclick="wishFromDex('${flower.name}', '${color}')">我缺這個</button>
@@ -797,6 +797,33 @@ function renderDex() {
 
 function toggleDex(btn) {
   btn.parentElement.classList.toggle("open");
+}
+
+function saveDexInput(input, key, limit) {
+  let number = Number(input.value);
+
+  if (Number.isNaN(number)) number = 0;
+  if (number < 0) number = 0;
+  if (number > limit) number = limit;
+  if (number > 1200) number = 1200;
+
+  input.value = String(number);
+  safeSetLocalStorage(key, String(number));
+  saveDexBackupValue(key, number);
+  updateDexRowStatus(input);
+}
+
+function updateDexRowStatus(input) {
+  const row = input.closest("tr");
+  if (!row) return;
+
+  const inputs = row.querySelectorAll(".dex-input-line input");
+  const statusCell = row.querySelector(".dex-status-cell");
+  if (!statusCell || inputs.length < 2) return;
+
+  const essence = Number(inputs[0].value || 0);
+  const petal = Number(inputs[1].value || 0);
+  statusCell.innerHTML = getDexStatus(essence, petal);
 }
 
 function saveDexValue(key, value, limit, shouldRender) {
