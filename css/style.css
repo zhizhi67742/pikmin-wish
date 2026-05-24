@@ -1508,3 +1508,101 @@ label textarea {
     margin: 3px 0 0 !important;
   }
 }
+
+
+/* ===== PikminWish v1.0.1 mobile dex limit layout hotfix ===== */
+.dex-jump-tip {
+  display: block !important;
+  margin: 10px auto 0 !important;
+  color: rgba(255,255,255,0.86) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.dex-header-panel .hint.dex-jump-tip {
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .dex-header-panel {
+    overflow: hidden !important;
+  }
+
+  .dex-header-row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .dex-header-row > div:first-child {
+    width: 100% !important;
+  }
+
+  .dex-header-row h2 {
+    text-align: center !important;
+    margin-bottom: 8px !important;
+  }
+
+  .dex-jump-tip {
+    max-width: 96% !important;
+    font-size: 13px !important;
+  }
+
+  .limit-settings {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 14px 0 0 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    justify-content: stretch !important;
+  }
+
+  .limit-settings label {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 7px 8px !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+    border: 1px solid rgba(255, 217, 102, 0.38) !important;
+    border-radius: 999px !important;
+    background: rgba(0,0,0,0.12) !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  .limit-settings input {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 72px !important;
+    justify-self: end !important;
+    height: 26px !important;
+    margin: 0 !important;
+    padding: 1px 4px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .limit-settings {
+    grid-template-columns: 1fr !important;
+  }
+}
