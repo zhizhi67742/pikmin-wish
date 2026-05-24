@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>花農許願池</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-decor decor-1">✨</div>
+  <div class="bg-decor decor-2">🌸</div>
+  <div class="bg-decor decor-3">🌱</div>
+
+  <header class="site-header">
+    <div class="tag">PIKMIN WISHING</div>
+    <h1>🌱 花農許願池</h1>
+    <p>留下你的願望，花農幫你實現。</p>
+
+    <div class="current-nickname-bar" id="currentNicknameBar">
+      <span class="nickname-icon">👤</span>
+      <span>目前暱稱：<strong id="currentNicknameText">未設定</strong></span>
+      <button type="button" class="nickname-edit-link" onclick="openNicknameModal()">✏️ 修改暱稱</button>
+    </div>
+
+    <nav class="main-nav">
+      <button class="nav-btn active" onclick="showSection('wish', this)">🌱 許願池</button>
+      <button class="nav-btn" onclick="showSection('dex', this)">🌸 花朵圖鑑</button>
+    </nav>
+
+    <div class="event-banner">
+      <div class="event-badge">🌼 5月新花</div>
+      <div>
+        <strong>勿忘草登場</strong>
+        <span>本月活動花種，記得更新你的圖鑑庫存！</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="wish" class="page-section active">
+
+      <section class="panel">
+        <h2>🌱 新增願望</h2>
+
+        <div class="form-grid">
+          <label>
+            花種（必填）
+            <input id="flowerInput" type="text" placeholder="例如：櫻花、勿忘草、藍玫瑰" /><br>
+            <p class="flower-tip">
+          ※ 許願白色花朵會隨機跳色，不一定會成功。
+          </p>
+          </label>
+
+          <label>
+            可收花時間區間
+            <div class="time-range">
+              <div class="time-block">
+                <span>開始</span>
+                <select id="startHour"></select>
+                <b>:</b>
+                <select id="startMinute"></select>
+              </div>
+
+              <div class="time-block">
+                <span>結束</span>
+                <select id="endHour"></select>
+                <b>:</b>
+                <select id="endMinute"></select>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <label>
+          留言（選填）
+          <textarea id="messageInput" rows="4" placeholder="例如：新手求幫忙、謝謝花農..."></textarea>
+        </label>
+
+        <button class="primary-btn" onclick="addWish()">🌱 新增願望卡</button>
+      </section>
+
+      <section class="section-title">
+        <h2>🌸 許願區</h2>
+      </section>
+      <div id="wishList" class="card-grid"></div>
+
+      <section class="section-title">
+        <h2>🌱 待完成區</h2>
+        <p>大家都看得到進度，但只有接單花農可以按「完成分享」。</p>
+      </section>
+      <div id="pendingList" class="card-grid"></div>
+
+      <section class="section-title">
+        <h2>✨ 已完成區</h2>
+        <p>分享地點支援多行座標，完成後 1 小時自動刪除。</p>
+      </section>
+      <div id="doneList" class="card-grid"></div>
+    </section>
+
+    <section id="dex" class="page-section">
+      <section class="panel dex-header-panel">
+        <div class="dex-header-row">
+          <div>
+            <h2>🌸 花朵圖鑑</h2>
+            <p class="hint">花種已依照清單全部內建。玩家只需要輸入精華與花瓣數量。</p>
+          </div>
+
+          <div class="limit-settings">
+            <label>
+              精華上限
+              <input id="essenceLimitInput" type="number" min="1" max="1200" value="1200" onchange="saveGlobalLimit('essence', this.value)" />
+            </label>
+
+            <label>
+              花瓣上限
+              <input id="petalLimitInput" type="number" min="1" max="1200" value="1200" onchange="saveGlobalLimit('petal', this.value)" />
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="dex-search-panel">
+        <input
+          id="dexSearchInput"
+          type="text"
+          placeholder="🔍 搜尋花種，例如：玫瑰、櫻花、鬱金香"
+          oninput="renderDex()"
+        />
+      </section>
+
+      <div id="flowerDexList" class="dex-list"></div>
+    </section>
+  </main>
+
+  <div id="confirmModal" class="modal">
+    <div class="modal-box">
+      <h2>確認接單？</h2>
+      <p>接單後這張願望卡會被鎖定，並移到待完成區，避免其他花農重複接單。</p>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeConfirmModal()">取消</button>
+        <button class="confirm-btn" onclick="confirmTakeOrder()">確認接單</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="doneModal" class="modal">
+    <div class="modal-box modal-box-large">
+      <h2>完成分享</h2>
+      <p>請輸入採收資訊與分享地點。分享地點可以直接貼上多行座標。</p>
+
+      <input
+        id="harvestInfoInput"
+        type="text"
+        placeholder="採收資訊，例如：印度、8朵、首花時間、隨意收"
+      />
+
+      <textarea
+        id="shareLocationInput"
+        class="coord-input"
+        rows="5"
+        placeholder="分享地點／座標，例如：
+22.xxx601,89.xxx802
+22.xxx729,89.xxx030
+22.xxx086,89.xxx989"
+      ></textarea>
+
+      <button class="clean-coord-btn" onclick="previewCleanCoords()">整理座標格式</button>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeDoneModal()">取消</button>
+        <button class="confirm-btn" onclick="openUploadConfirmModal()">送出完成</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="uploadConfirmModal" class="modal">
+    <div class="modal-box">
+      <h2>確認上傳座標？</h2>
+      <p>請確認座標與採收資訊都正確。送出後會公開到完成區，並在 1 小時後自動刪除。</p>
+
+      <div class="confirm-preview">
+        <p><strong>採收資訊：</strong><span id="uploadHarvestPreview">尚未填寫</span></p>
+        <p><strong>座標數量：</strong><span id="uploadCoordCount">0</span> 組</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeUploadConfirmModal()">返回修改</button>
+        <button class="confirm-btn" onclick="confirmDone()">確認上傳</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      setDoc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAiMnrVOduGYTvehcCqb-3GvnrjDkzA-IE",
+      authDomain: "pikmin-wish.firebaseapp.com",
+      projectId: "pikmin-wish",
+      storageBucket: "pikmin-wish.firebasestorage.app",
+      messagingSenderId: "504626817337",
+      appId: "1:504626817337:web:92d164fc431d8c42c5e0e8",
+      measurementId: "G-E49FV9QS2Z"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.firebaseDB = db;
+    window.firebaseFns = {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      setDoc,
+      getDoc
+    };
+
+    window.dispatchEvent(new Event("firebase-ready"));
+  </script>
+
+
+<div id="nicknameGate" class="nickname-gate">
+  <div class="nickname-modal">
+    <h1>🌱 花農許願池規則</h1>
+
+    <div class="rule-scroll">
+
+      <div class="rule-section">
+        <h2>@採花者</h2>
+        <p>花農願意分享是熱心，不是義務，請遵守：</p>
+
+        <ul>
+          <li>非開花時間勿前往</li>
+          <li>不踩未開花花苗</li>
+          <li>指定花瓣請配合（白花收、櫻花收...）</li>
+        </ul>
+      </div>
+
+      <div class="rule-section">
+        <h2>@花農</h2>
+        <p>花農分享前請注意：</p>
+
+        <ul>
+          <li>有限制請備註清楚（花瓣顏色、禁轉傳）</li>
+          <li>先確認田地是否已有他人耕作</li>
+          <li>分享前請先做好被亂採心理準備</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="nickname-input-wrap">
+      <label>輸入 LINE 社群或Dc暱稱</label>
+
+      <input
+        type="text"
+        id="gateNicknameInput"
+        placeholder="請輸入 LINE 社群或Dc暱稱"
+      />
+
+      <p class="nickname-tip">
+        ※ 請使用 LINE 社群或Dc暱稱，方便 @提醒
+      </p>
+
+      <button class="enter-btn" onclick="enterWebsite()">
+        進入網站
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div class="footer" style="text-align:center;">
+  <div style="margin-bottom:8px; font-size:13px; opacity:0.85;">
+    此網頁僅供「皮克敏飛人交流群💐Pikmin Bloom」&「ᴘɪᴋᴍɪɴ ʙʟᴏᴏᴍ皮皮之家🌱」使用
+  </div>
+
+  <div>
+    梔梔製作 v1.0 ｜ 許願池及花朵圖鑑
+  </div>
+</div>
+</p></p>
+</body>
+</html>
