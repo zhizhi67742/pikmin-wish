@@ -113,7 +113,7 @@ const DEFAULT_FLOWER_DEX = [
   { name: "牡丹", colors: ["白", "黃", "紅", "藍"] },
   { name: "矮牽牛", colors: ["白", "黃", "紅", "藍"] },
   { name: "梅花", colors: ["白", "黃", "紅"] },
-  { name: "雞塵花", colors: ["白", "黃", "紅"] },
+  { name: "雞蛋花", colors: ["白", "黃", "紅"] },
   { name: "聖誕紅", colors: ["白", "黃", "紅", "藍"] },
   { name: "櫻草花", colors: ["白", "黃", "紅", "藍"] },
   { name: "玫瑰", colors: ["白", "黃", "紅", "藍"] },
@@ -143,7 +143,6 @@ function buildTimeOptions() {
 
   hourIds.forEach(function (id) {
     const el = document.getElementById(id);
-    if (!el) return;
     for (let i = 0; i <= 23; i++) {
       const option = document.createElement("option");
       option.value = String(i).padStart(2, "0");
@@ -154,7 +153,6 @@ function buildTimeOptions() {
 
   minuteIds.forEach(function (id) {
     const el = document.getElementById(id);
-    if (!el) return;
     ["00", "10", "20", "30", "40", "50"].forEach(function (m) {
       const option = document.createElement("option");
       option.value = m;
@@ -163,28 +161,27 @@ function buildTimeOptions() {
     });
   });
 
-  if (document.getElementById("startHour")) document.getElementById("startHour").value = "14";
-  if (document.getElementById("endHour")) document.getElementById("endHour").value = "20";
+  document.getElementById("startHour").value = "14";
+  document.getElementById("endHour").value = "20";
 }
 
 function showSection(sectionId, btn) {
   document.querySelectorAll(".page-section").forEach(function (section) {
     section.classList.remove("active");
   });
-  const targetSection = document.getElementById(sectionId);
-  if (targetSection) targetSection.classList.add("active");
+  document.getElementById(sectionId).classList.add("active");
 
   document.querySelectorAll(".nav-btn").forEach(function (item) {
     item.classList.remove("active");
   });
-  if (btn) btn.classList.add("active");
+  btn.classList.add("active");
 }
 
 function saveNickname() {
   const input = document.getElementById("nicknameInput");
   if (!input) return;
 
-  nickname = input.value.trim();
+  nickname = input ? input.value.trim() : "";
 
   if (!nickname) {
     alert("請先輸入 LINE 社群暱稱。");
@@ -193,14 +190,11 @@ function saveNickname() {
 
   localStorage.setItem("flowerWishNickname", nickname);
   alert("暱稱已設定：" + nickname);
-  updateNicknameDisplay();
 }
 
 function addWish() {
-  const flowerInput = document.getElementById("flowerInput");
-  const messageInput = document.getElementById("messageInput");
-  const flower = flowerInput ? flowerInput.value.trim() : "";
-  const message = messageInput ? messageInput.value.trim() : "";
+  const flower = document.getElementById("flowerInput").value.trim();
+  const message = document.getElementById("messageInput").value.trim();
 
   nickname = getCurrentNickname();
 
@@ -214,13 +208,8 @@ function addWish() {
     return;
   }
 
-  const startHour = document.getElementById("startHour")?.value || "14";
-  const startMinute = document.getElementById("startMinute")?.value || "00";
-  const endHour = document.getElementById("endHour")?.value || "20";
-  const endMinute = document.getElementById("endMinute")?.value || "00";
-
-  const start = startHour + ":" + startMinute;
-  const end = endHour + ":" + endMinute;
+  const start = document.getElementById("startHour").value + ":" + document.getElementById("startMinute").value;
+  const end = document.getElementById("endHour").value + ":" + document.getElementById("endMinute").value;
 
   wishes.unshift({
     id: Date.now(),
@@ -233,8 +222,8 @@ function addWish() {
     isExample: false
   });
 
-  if (flowerInput) flowerInput.value = "";
-  if (messageInput) messageInput.value = "";
+  document.getElementById("flowerInput").value = "";
+  document.getElementById("messageInput").value = "";
   saveData();
   renderAll();
 }
@@ -246,6 +235,9 @@ function openConfirmModal(id) {
     modal.classList.add("show");
   }
 }
+
+// 給動態產生的卡片使用：避免 inline onclick 在某些瀏覽器/同步卡片上失效
+
 
 document.addEventListener("click", function (event) {
   const helpBtn = event.target.closest(".help-btn[data-wish-key]");
@@ -324,8 +316,7 @@ function deleteWish(id) {
 
 function closeConfirmModal() {
   selectedWishId = null;
-  const modal = document.getElementById("confirmModal");
-  if (modal) modal.classList.remove("show");
+  document.getElementById("confirmModal").classList.remove("show");
 }
 
 function confirmTakeOrder() {
@@ -396,24 +387,23 @@ function openDoneModal(id) {
 
   selectedPendingId = id;
 
+  // 每次打開新的完成視窗都清空欄位，避免沿用上一筆已送出的座標/採收資訊。
   const harvestInput = document.getElementById("harvestInfoInput");
   const locationInput = document.getElementById("shareLocationInput");
   if (harvestInput) harvestInput.value = "";
   if (locationInput) locationInput.value = "";
 
-  const modal = document.getElementById("doneModal");
-  if (modal) modal.classList.add("show");
+  document.getElementById("doneModal").classList.add("show");
 }
 
 function closeDoneModal() {
   selectedPendingId = null;
-  const modal = document.getElementById("doneModal");
-  if (modal) modal.classList.remove("show");
+  document.getElementById("doneModal").classList.remove("show");
 }
+
 
 function previewCleanCoords() {
   const input = document.getElementById("shareLocationInput");
-  if (!input) return;
   const cleaned = cleanCoordinates(input.value);
 
   if (!cleaned) {
@@ -425,11 +415,11 @@ function previewCleanCoords() {
   alert("座標格式已整理完成！");
 }
 
+
+
 function openUploadConfirmModal() {
-  const harvestInput = document.getElementById("harvestInfoInput");
-  const locationInput = document.getElementById("shareLocationInput");
-  const harvestInfo = harvestInput ? harvestInput.value.trim() : "";
-  const rawLocation = locationInput ? locationInput.value : "";
+  const harvestInfo = document.getElementById("harvestInfoInput").value.trim();
+  const rawLocation = document.getElementById("shareLocationInput").value;
   const cleanedLocation = cleanCoordinates(rawLocation);
 
   if (!cleanedLocation) {
@@ -437,32 +427,23 @@ function openUploadConfirmModal() {
     return;
   }
 
-  if (locationInput) locationInput.value = cleanedLocation;
-  
-  const uploadHarvestPreview = document.getElementById("uploadHarvestPreview");
-  const uploadCoordCount = document.getElementById("uploadCoordCount");
-  if (uploadHarvestPreview) uploadHarvestPreview.textContent = harvestInfo || "沒有補充採收資訊";
-  if (uploadCoordCount) uploadCoordCount.textContent = cleanedLocation.split("
-").filter(Boolean).length;
+  document.getElementById("shareLocationInput").value = cleanedLocation;
+  document.getElementById("uploadHarvestPreview").textContent = harvestInfo || "沒有補充採收資訊";
+  document.getElementById("uploadCoordCount").textContent = cleanedLocation.split("\n").filter(Boolean).length;
 
-  const doneModal = document.getElementById("doneModal");
-  const uploadConfirmModal = document.getElementById("uploadConfirmModal");
-  if (doneModal) doneModal.classList.remove("show");
-  if (uploadConfirmModal) uploadConfirmModal.classList.add("show");
+  document.getElementById("doneModal").classList.remove("show");
+  document.getElementById("uploadConfirmModal").classList.add("show");
 }
 
 function closeUploadConfirmModal() {
-  const doneModal = document.getElementById("doneModal");
-  const uploadConfirmModal = document.getElementById("uploadConfirmModal");
-  if (uploadConfirmModal) uploadConfirmModal.classList.remove("show");
-  if (doneModal) doneModal.classList.add("show");
+  document.getElementById("uploadConfirmModal").classList.remove("show");
+  document.getElementById("doneModal").classList.add("show");
 }
 
+
 async function confirmDone() {
-  const harvestInput = document.getElementById("harvestInfoInput");
-  const locationInput = document.getElementById("shareLocationInput");
-  const harvestInfo = harvestInput ? harvestInput.value.trim() : "";
-  const rawLocation = locationInput ? locationInput.value : "";
+  const harvestInfo = document.getElementById("harvestInfoInput").value.trim();
+  const rawLocation = document.getElementById("shareLocationInput").value;
   const location = cleanCoordinates(rawLocation);
 
   if (!location) {
@@ -492,6 +473,8 @@ async function confirmDone() {
 
   done.unshift(item);
 
+  // 如果這筆願望來自 Firebase，要同步標記為完成。
+  // 否則即時同步會再次把它從雲端讀回「待完成」，看起來就像網站回朔。
   if (item.firebaseId && window.firebaseDB && window.firebaseFns) {
     const { updateDoc, doc } = window.firebaseFns;
     try {
@@ -512,12 +495,11 @@ async function confirmDone() {
   }
 
   selectedPendingId = null;
-  if (locationInput) locationInput.value = "";
-  if (harvestInput) harvestInput.value = "";
+  document.getElementById("shareLocationInput").value = "";
+  document.getElementById("harvestInfoInput").value = "";
 
   closeDoneModal();
-  const uploadConfirmModal = document.getElementById("uploadConfirmModal");
-  if (uploadConfirmModal) uploadConfirmModal.classList.remove("show");
+  document.getElementById("uploadConfirmModal").classList.remove("show");
   saveData();
   renderAll();
 }
@@ -533,7 +515,6 @@ function renderAll() {
 function renderWishes() {
   removeExpiredWishes();
   const list = document.getElementById("wishList");
-  if (!list) return;
   list.innerHTML = "";
 
   if (wishes.length === 0) {
@@ -582,7 +563,6 @@ function renderWishes() {
 
 function renderPending() {
   const list = document.getElementById("pendingList");
-  if (!list) return;
   list.innerHTML = "";
 
   if (pending.length === 0) {
@@ -617,7 +597,6 @@ function renderDone() {
   });
 
   const list = document.getElementById("doneList");
-  if (!list) return;
   list.innerHTML = "";
 
   if (done.length === 0) {
@@ -638,7 +617,7 @@ function renderDone() {
         <p>🌱 接單花農：${escapeHtml(item.farmer)}</p>
         <p>🌼 採收資訊：${escapeHtml(item.harvestInfo)}</p>
         <p>📍 分享地點／座標：</p>
-        <pre class="coord-list" id="coord-${item.id}">${escapeHtml(item.location).replace(/\\n/g, "\\n")}</pre>
+        <pre class="coord-list" id="coord-${item.id}">${escapeHtml(item.location).replace(/\\n/g, "\n")}</pre>
 
         <div class="done-actions">
           <button class="like-btn ${item.liked ? "liked" : ""}" type="button" data-done-key="${escapeHtml(doneKey)}">
@@ -674,6 +653,7 @@ async function toggleLike(id) {
   const doneKey = getWishKey(item);
   const alreadyLiked = hasLikedDoneKey(doneKey);
 
+  // 可按讚／取消按讚：再點一次會取消，數字不會低於 0
   if (alreadyLiked) {
     item.likes = Math.max(0, Number(item.likes || 0) - 1);
     item.liked = false;
@@ -684,9 +664,11 @@ async function toggleLike(id) {
     setLikedDoneKey(doneKey, true);
   }
 
+
   saveData();
   renderDone();
 
+  // 完成區的讚數要寫回 Firebase，否則重新整理或即時同步後會變回 0。
   if (item.firebaseId && window.firebaseDB && window.firebaseFns) {
     const { updateDoc, doc } = window.firebaseFns;
     try {
@@ -707,7 +689,7 @@ function copyCoords(id) {
 
   if (!item) return;
 
-  const coordCount = item.location.split("\\n").filter(Boolean).length;
+  const coordCount = item.location.split("\n").filter(Boolean).length;
 
   navigator.clipboard.writeText(item.location).then(function () {
     alert("已複製 " + coordCount + " 組座標！");
@@ -724,7 +706,6 @@ function copyCoords(id) {
 
 function renderDex() {
   const list = document.getElementById("flowerDexList");
-  if (!list) return;
   const searchInput = document.getElementById("dexSearchInput");
   const keyword = searchInput ? searchInput.value.trim() : "";
 
@@ -752,6 +733,7 @@ function renderDex() {
       rows += `
         <tr>
           <td>${getColorEmoji(color)} ${color}</td>
+
           <td>
             <div class="dex-input-line">
               <input
@@ -765,6 +747,7 @@ function renderDex() {
               <span>/ ${essenceLimit}</span>
             </div>
           </td>
+
           <td>
             <div class="dex-input-line">
               <input
@@ -778,7 +761,9 @@ function renderDex() {
               <span>/ ${petalLimit}</span>
             </div>
           </td>
+
           <td>${getDexStatus(essence, petal)}</td>
+
           <td>
             <button class="confirm-btn" onclick="wishFromDex('${flower.name}', '${color}')">缺</button>
           </td>
@@ -811,9 +796,7 @@ function renderDex() {
 }
 
 function toggleDex(btn) {
-  if (btn && btn.parentElement) {
-    btn.parentElement.classList.toggle("open");
-  }
+  btn.parentElement.classList.toggle("open");
 }
 
 function saveDexValue(key, value, limit, shouldRender) {
@@ -885,12 +868,9 @@ function clampDexValuesToLimits() {
 }
 
 function wishFromDex(name, color) {
-  const navBtns = document.querySelectorAll(".nav-btn");
-  if (navBtns.length > 0) {
-    showSection("wish", navBtns[0]);
-  }
-  const flowerInput = document.getElementById("flowerInput");
-  if (flowerInput) flowerInput.value = color + "色" + name;
+  const firstBtn = document.querySelectorAll(".nav-btn")[0];
+  showSection("wish", firstBtn);
+  document.getElementById("flowerInput").value = color + "色" + name;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -903,7 +883,7 @@ function getDexStatus(essence, petal) {
     return '<span class="status-low">不足 ⚠️</span>';
   }
 
-  return "收收集 🌱";
+  return "收集中 🌱";
 }
 
 function getColorEmoji(color) {
@@ -915,6 +895,7 @@ function getColorEmoji(color) {
   };
   return map[color] || "🌸";
 }
+
 
 function getWishDeleteAtFromEndTime(endTime) {
   const now = new Date();
@@ -944,7 +925,7 @@ function cleanCoordinates(rawText) {
     .filter(function (item, index, arr) {
       return item && arr.indexOf(item) === index;
     })
-    .join("\\n");
+    .join("\n");
 }
 
 function formatRemainTime(targetTime) {
@@ -969,10 +950,19 @@ function isEndingSoon(targetTime) {
   return remain > 0 && remain <= 30 * 60 * 1000;
 }
 
+
 function removeDemoWishesFromStorage() {
-  wishes = wishes.filter(function (wish) { return wish.nickname !== "小芽"; });
-  pending = pending.filter(function (wish) { return wish.nickname !== "小芽"; });
-  done = done.filter(function (wish) { return wish.nickname !== "小芽"; });
+  wishes = wishes.filter(function (wish) {
+    return wish.nickname !== "小芽";
+  });
+
+  pending = pending.filter(function (wish) {
+    return wish.nickname !== "小芽";
+  });
+
+  done = done.filter(function (wish) {
+    return wish.nickname !== "小芽";
+  });
 
   safeSetLocalStorage("flowerWishWishes", JSON.stringify(wishes));
   safeSetLocalStorage("flowerWishPending", JSON.stringify(pending));
@@ -1048,6 +1038,7 @@ function loadData() {
     });
   }
 
+
   flowerDex = JSON.parse(JSON.stringify(DEFAULT_FLOWER_DEX));
   restoreDexBackupValues();
 }
@@ -1060,6 +1051,7 @@ function escapeHtml(text) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
 
 function safeSetLocalStorage(key, value) {
   try {
@@ -1124,9 +1116,13 @@ function fixExampleCardMessageSafely() {
   }
 }
 
+
+
 /* =========================
-   花朵圖鑑雲端同步
+   花朵圖鑑雲端同步（用暱稱當同步代號）
+   同一個暱稱在手機/電腦輸入後，就會讀同一份圖鑑。
 ========================= */
+
 let dexCloudSaveTimer = null;
 let dexCloudLoadedName = "";
 let dexCloudIsApplying = false;
@@ -1169,6 +1165,7 @@ async function loadDexFromCloud(name) {
       const localBackup = getDexBackup()[key];
       const localUpdatedAt = localBackup ? Number(localBackup.updatedAt || 0) : 0;
 
+      // 新裝置沒有資料時讀雲端；兩邊都有資料時保留更新時間較新的。
       if (safeGetLocalStorage(key) === null || cloudUpdatedAt >= localUpdatedAt) {
         safeSetLocalStorage(key, String(Number(cloudValue) || 0));
       }
@@ -1184,6 +1181,7 @@ async function loadDexFromCloud(name) {
       safeSetLocalStorage("flowerWishPetalLimit", String(petalLimit));
     }
 
+    // 把雲端值重新整理進備份，之後才不會被舊 localStorage 蓋回去。
     const backup = getDexBackup();
     Object.keys(values).forEach(function (key) {
       const item = values[key];
@@ -1242,29 +1240,56 @@ async function saveDexToCloud(name) {
 }
 
 /* =========================
-   Firebase 即時同步與主要操作修正
+   Firebase 即時同步系統
 ========================= */
+
 window.addEventListener("firebase-ready", () => {
   startFirebaseSync();
 });
 
 async function startFirebaseSync() {
   const db = window.firebaseDB;
-  const { collection, addDoc, updateDoc, doc, onSnapshot } = window.firebaseFns;
+  const {
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    setDoc,
+    getDoc
+  } = window.firebaseFns;
+
   const wishesRef = collection(db, "wishes");
 
+  // Firebase 準備好後，先讀取這個暱稱的雲端圖鑑。
   const savedDexName = getCurrentNickname();
   if (savedDexName) {
     loadDexFromCloud(savedDexName);
   }
 
+  // 即時同步許願卡：許願區公開、待完成區公開、完成區公開。
   onSnapshot(wishesRef, (snapshot) => {
-    wishes = wishes.filter(item => !item.firebaseId);
-    pending = pending.filter(item => !item.firebaseId);
-    done = done.filter(item => !item.firebaseId);
+    const localWishes = wishes.filter(function (item) {
+      return !item.firebaseId;
+    });
+    const localPending = pending.filter(function (item) {
+      return !item.firebaseId;
+    });
+    const localDone = done.filter(function (item) {
+      return !item.firebaseId;
+    });
+
+    wishes = localWishes;
+    pending = localPending;
+    done = localDone;
 
     snapshot.forEach((docItem) => {
-      const data = { firebaseId: docItem.id, ...docItem.data() };
+      const data = {
+        firebaseId: docItem.id,
+        ...docItem.data()
+      };
+
       if (data.status === "pending") {
         data.farmer = data.farmer || data.acceptedBy || "花農";
         pending.push(data);
@@ -1282,6 +1307,9 @@ async function startFirebaseSync() {
     bindDynamicButtons();
   });
 
+  // Firebase 新增願望
+  const originalAddWish = window.addWish;
+
   window.addWish = async function () {
     const flower = document.getElementById("flowerInput")?.value?.trim();
     const nickname = getCurrentNickname();
@@ -1291,6 +1319,7 @@ async function startFirebaseSync() {
       openRuleModal();
       return;
     }
+
     if (!flower) {
       alert("請輸入花種");
       return;
@@ -1300,9 +1329,11 @@ async function startFirebaseSync() {
     const startMinute = document.getElementById("startMinute")?.value || "00";
     const endHour = document.getElementById("endHour")?.value || "20";
     const endMinute = document.getElementById("endMinute")?.value || "00";
+
     const message = document.getElementById("messageInput")?.value || "";
 
     const now = new Date();
+
     const newWish = {
       flower,
       nickname,
@@ -1315,16 +1346,24 @@ async function startFirebaseSync() {
     };
 
     await addDoc(wishesRef, newWish);
-    if (document.getElementById("flowerInput")) document.getElementById("flowerInput").value = "";
-    if (document.getElementById("messageInput")) document.getElementById("messageInput").value = "";
+
+    document.getElementById("flowerInput").value = "";
+    if (document.getElementById("messageInput")) {
+      document.getElementById("messageInput").value = "";
+    }
   };
 
+  // 接單同步
   window.acceptWish = async function(firebaseId) {
     const nickname = localStorage.getItem("flowerWishNickname") || "花農";
+
     const target = wishes.find(w => w.firebaseId === firebaseId);
+
     if (!target) return;
 
-    if (!confirm(`確認接單 ${target.flower} 嗎？`)) return;
+    const ok = confirm(`確認接單 ${target.flower} 嗎？`);
+
+    if (!ok) return;
 
     await updateDoc(doc(db, "wishes", firebaseId), {
       acceptedBy: nickname,
@@ -1332,13 +1371,16 @@ async function startFirebaseSync() {
       acceptedAt: formatNow(),
       status: "pending"
     });
+
     alert("接單成功！");
   };
 }
 
+
+
+
 function enterWebsite() {
   const input = document.getElementById("gateNicknameInput");
-  if (!input) return;
   nickname = input.value.trim();
 
   if (!nickname) {
@@ -1353,10 +1395,7 @@ function enterWebsite() {
     nicknameInput.value = nickname;
   }
 
-  const gate = document.getElementById("nicknameGate");
-  if (gate) gate.classList.add("hidden-gate");
-
-  updateNicknameDisplay();
+  document.getElementById("nicknameGate").classList.add("hidden-gate");
 
   if (window.firebaseDB && window.firebaseFns) {
     loadDexFromCloud(nickname);
@@ -1371,6 +1410,7 @@ function openRuleModal() {
   if (input && savedNickname) {
     input.value = savedNickname;
   }
+
   if (gate) {
     gate.classList.remove("hidden-gate");
   }
@@ -1381,14 +1421,21 @@ window.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("gateNicknameInput");
   const nicknameInput = document.getElementById("nicknameInput");
 
-  if (input && savedNickname) input.value = savedNickname;
-  if (nicknameInput && savedNickname) nicknameInput.value = savedNickname;
+  if (input && savedNickname) {
+    input.value = savedNickname;
+  }
 
+  if (nicknameInput && savedNickname) {
+    nicknameInput.value = savedNickname;
+  }
+
+  // 每次進入網站都顯示規則視窗，但暱稱會自動帶入
   const gate = document.getElementById("nicknameGate");
   if (gate) {
     gate.classList.remove("hidden-gate");
   }
 });
+
 
 function updateNicknameDisplay() {
   const nicknameText = document.getElementById("currentNicknameText");
@@ -1399,8 +1446,25 @@ function updateNicknameDisplay() {
 }
 
 function openNicknameModal() {
-  openRuleModal();
+  const gate = document.getElementById("nicknameGate");
+  if (!gate) return;
+
+  gate.classList.remove("hidden-gate");
+
+  const input = document.getElementById("gateNicknameInput");
+  const savedNickname = localStorage.getItem("flowerWishNickname");
+
+  if (input && savedNickname) {
+    input.value = savedNickname;
+  }
 }
+
+const originalEnterWebsite = enterWebsite;
+enterWebsite = async function(...args) {
+  const result = await originalEnterWebsite.apply(this, args);
+  updateNicknameDisplay();
+  return result;
+};
 
 window.addEventListener("load", () => {
   setTimeout(updateNicknameDisplay, 300);

@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>花農許願池</title>
   <link rel="stylesheet" href="css/style.css" />
-  <!-- 內嵌極簡樣式以確保 Gate 能正常隱藏與顯示 -->
-  <style>
-    .nickname-gate {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); display: flex; align-items: center;
-      justify-content: center; z-index: 9999;
-    }
-    .nickname-gate.hidden-gate {
-      display: none !important;
-    }
-  </style>
 </head>
 <body>
   <div class="bg-decor decor-1">✨</div>
@@ -185,6 +175,7 @@
     </div>
   </div>
 
+
   <div id="uploadConfirmModal" class="modal">
     <div class="modal-box">
       <h2>確認上傳座標？</h2>
@@ -247,56 +238,67 @@
     window.dispatchEvent(new Event("firebase-ready"));
   </script>
 
-  <div id="nicknameGate" class="nickname-gate">
-    <div class="nickname-modal">
-      <h1>🌱 花農許願池規則</h1>
 
-      <div class="rule-scroll">
-        <div class="rule-section">
-          <h2>@採花者</h2>
-          <p>花農願意分享是熱心，不是義務，請遵守：</p>
-          <ul>
-            <li>非開花時間勿前往</li>
-            <li>不踩未開花花苗</li>
-            <li>指定花瓣請配合（白花收、櫻花收...）</li>
-          </ul>
-        </div>
+<div id="nicknameGate" class="nickname-gate">
+  <div class="nickname-modal">
+    <h1>🌱 花農許願池規則</h1>
 
-        <div class="rule-section">
-          <h2>@花農</h2>
-          <p>花農分享前請注意：</p>
-          <ul>
-            <li>有限制請備註清楚（花瓣顏色、禁轉傳）</li>
-            <li>先確認田地是否已有他人耕作</li>
-            <li>分享前請先做好被亂採心理準備</li>
-          </ul>
-        </div>
+    <div class="rule-scroll">
+
+      <div class="rule-section">
+        <h2>@採花者</h2>
+        <p>花農願意分享是熱心，不是義務，請遵守：</p>
+
+        <ul>
+          <li>非開花時間勿前往</li>
+          <li>不踩未開花花苗</li>
+          <li>指定花瓣請配合（白花收、櫻花收...）</li>
+        </ul>
       </div>
 
-      <div class="nickname-input-wrap">
-        <label>輸入 LINE 社群或Dc暱稱</label>
-        <input
-          type="text"
-          id="gateNicknameInput"
-          placeholder="請輸入 LINE 社群或Dc暱稱"
-        />
-        <p class="nickname-tip">
-          ※ 請使用 LINE 社群或Dc暱稱，方便 @提醒
-        </p>
-        <button class="enter-btn" onclick="enterWebsite()">
-          進入網站
-        </button>
+      <div class="rule-section">
+        <h2>@花農</h2>
+        <p>花農分享前請注意：</p>
+
+        <ul>
+          <li>有限制請備註清楚（花瓣顏色、禁轉傳）</li>
+          <li>先確認田地是否已有他人耕作</li>
+          <li>分享前請先做好被亂採心理準備</li>
+        </ul>
       </div>
+
     </div>
+
+    <div class="nickname-input-wrap">
+      <label>輸入 LINE 社群或Dc暱稱</label>
+
+      <input
+        type="text"
+        id="gateNicknameInput"
+        placeholder="請輸入 LINE 社群或Dc暱稱"
+      />
+
+      <p class="nickname-tip">
+        ※ 請使用 LINE 社群或Dc暱稱，方便 @提醒
+      </p>
+
+      <button class="enter-btn" onclick="enterWebsite()">
+        進入網站
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div class="footer" style="text-align:center;">
+  <div style="margin-bottom:8px; font-size:13px; opacity:0.85;">
+    此網頁僅供「皮克敏飛人交流群💐Pikmin Bloom」&「ᴘɪᴋᴍɪɴ ʙʟᴏᴏᴍ皮皮之家🌱」使用
   </div>
 
-  <div class="footer" style="text-align:center;">
-    <div style="margin-bottom:8px; font-size:13px; opacity:0.85;">
-      此網頁僅供「皮克敏飛人交流群💐Pikmin Bloom」&「ᴘɪᴋᴍɪɴ ʙʟᴏᴏ模皮皮之家🌱」使用
-    </div>
-    <div>
-      梔梔製作 v1.0 ｜ 許願池及花朵圖鑑
-    </div>
+  <div>
+    梔梔製作 v1.0 ｜ 許願池及花朵圖鑑
   </div>
+</div>
+</p></p>
 </body>
 </html>
