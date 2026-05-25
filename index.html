@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>花農許願池</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=dropdown-under-input-fix-20260526" />
 
 <style>
 .wish-history-item{
@@ -16,10 +16,298 @@
   line-height: 1.6;
   word-break: break-word;
 }
+
+    .nickname-row {
+      display:flex;
+      gap:0;
+      align-items:stretch;
+    }
+
+    #socialTypeSelect {
+      width:96px;
+      flex:0 0 96px;
+      height:52px;
+      background:#111922;
+      color:#ffd966;
+      border:1px solid rgba(255,217,102,.32);
+      border-right:0;
+      border-radius:16px 0 0 16px;
+      padding:0 12px;
+      font-size:14px;
+      font-weight:800;
+      outline:none;
+      cursor:pointer;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    #socialTypeSelect option {
+      background:#111922;
+      color:#ffd966;
+    }
+
+    #gateNicknameInput {
+      height:52px;
+      border-radius:0 16px 16px 0;
+      border:1px solid rgba(255,217,102,.32);
+      background:#111922;
+      color:#f5f7f4;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    #gateNicknameInput::placeholder {
+      color:rgba(245,247,244,.55);
+    }
+
+
+.harvest-quick-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0 14px;
+}
+
+.harvest-tag-btn,
+.harvest-tag-clear{
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s ease;
+  background:rgba(255,255,255,0.08);
+  color:#f5f5f5;
+}
+
+.harvest-tag-btn:hover,
+.harvest-tag-clear:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,0.14);
+}
+
+.harvest-tag-btn.active{
+  background:#c9df7a;
+  color:#1f3316;
+  font-weight:700;
+}
+
+.harvest-tag-clear{
+  background:rgba(255,180,180,0.16);
+  color:#ffd6d6;
+}
+
+@media (max-width: 768px){
+  .harvest-tag-btn,
+  .harvest-tag-clear{
+    font-size:13px;
+    padding:7px 12px;
+  }
+}
+
 </style>
 
+<style>
+
+/* ===== FORCE FIX: 目前暱稱固定在標題下方，不覆蓋大標 ===== */
+#currentNicknameBar,
+.current-nickname-bar,
+.currentNicknameBar,
+.nickname-status,
+.nickname-pill {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  translate: none !important;
+  float: none !important;
+  clear: both !important;
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: calc(100vw - 32px) !important;
+  margin: 16px auto 0 auto !important;
+  z-index: 1 !important;
+}
+
+.hero,
+.hero-section,
+.hero-content,
+.hero-inner,
+.header-content,
+.main-hero,
+.landing-hero {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.hero h1,
+.hero-title,
+.main-title,
+.site-title,
+h1 {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin-bottom: 0 !important;
+  z-index: 2 !important;
+}
+
+#currentNicknameBar {
+  order: 3 !important;
+}
+
+@media (min-width: 769px) {
+  #currentNicknameBar,
+  .current-nickname-bar,
+  .currentNicknameBar,
+  .nickname-status,
+  .nickname-pill {
+    margin-top: 18px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #currentNicknameBar,
+  .current-nickname-bar,
+  .currentNicknameBar,
+  .nickname-status,
+  .nickname-pill {
+    margin-top: 12px !important;
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+
+.harvest-quick-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0 14px;
+}
+
+.harvest-tag-btn,
+.harvest-tag-clear{
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s ease;
+  background:rgba(255,255,255,0.08);
+  color:#f5f5f5;
+}
+
+.harvest-tag-btn:hover,
+.harvest-tag-clear:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,0.14);
+}
+
+.harvest-tag-btn.active{
+  background:#c9df7a;
+  color:#1f3316;
+  font-weight:700;
+}
+
+.harvest-tag-clear{
+  background:rgba(255,180,180,0.16);
+  color:#ffd6d6;
+}
+
+@media (max-width: 768px){
+  .harvest-tag-btn,
+  .harvest-tag-clear{
+    font-size:13px;
+    padding:7px 12px;
+  }
+}
+
+</style>
+
+<style>
+
+/* ===== FINAL FIX: 剛進入規則頁 LINE/DC 選單箭頭 ===== */
+#nicknameGate select#socialTypeSelect,
+#nicknameGate select.gate-social-select,
+#nicknameGate select.gate-platform-select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-color: #111827 !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 9l5 5 5-5' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 16px center !important;
+  background-size: 18px 18px !important;
+  padding-right: 44px !important;
+}
+
+/* 關掉前幾版造成的第二顆箭頭 */
+#nicknameGate .gate-platform-wrap::after,
+#nicknameGate .gate-platform-field::after,
+#nicknameGate .platform-row::after,
+#nicknameGate .gate-social-select::after,
+#nicknameGate #socialTypeSelect::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 避免 wrapper 變成額外方塊 */
+#nicknameGate .gate-platform-wrap {
+  display: contents !important;
+}
+
+
+.harvest-quick-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0 14px;
+}
+
+.harvest-tag-btn,
+.harvest-tag-clear{
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s ease;
+  background:rgba(255,255,255,0.08);
+  color:#f5f5f5;
+}
+
+.harvest-tag-btn:hover,
+.harvest-tag-clear:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,0.14);
+}
+
+.harvest-tag-btn.active{
+  background:#c9df7a;
+  color:#1f3316;
+  font-weight:700;
+}
+
+.harvest-tag-clear{
+  background:rgba(255,180,180,0.16);
+  color:#ffd6d6;
+}
+
+@media (max-width: 768px){
+  .harvest-tag-btn,
+  .harvest-tag-clear{
+    font-size:13px;
+    padding:7px 12px;
+  }
+}
+
+</style>
 </head>
 <body>
+  <button id="backToTopBtn" type="button" title="回到頂部" aria-label="回到頂部">⬆</button>
+
   <div class="bg-decor decor-1">✨</div>
   <div class="bg-decor decor-2">🌸</div>
   <div class="bg-decor decor-3">🌱</div>
@@ -58,32 +346,44 @@
         <h2>🌱 新增願望</h2>
 
         <div class="form-grid">
-          <label>
-            花種（必填）
-            <input id="flowerInput" type="text" placeholder="例如：櫻花、勿忘草、藍玫瑰" /><br>
-            <p class="flower-tip">
-          ※ 許願白色花朵會隨機跳色，不一定會成功。
-          </p>
-          </label>
-
-          <label>
-            可收花時間區間
-            <div class="time-range">
-              <div class="time-block">
-                <span>開始</span>
-                <select id="startHour"></select>
-                <b>:</b>
-                <select id="startMinute"></select>
+          <div class="wish-top-fields">
+            <label class="flower-field">
+              花種（必填）
+              <input id="flowerInput" type="hidden" />
+              <div class="flower-picker">
+                <div class="flower-picker-row combo-row">
+                  <div class="clearable-input flower-combo-wrap">
+                    <input id="flowerComboInput" type="text" placeholder="🔍 可輸入或點選花種" autocomplete="off" />
+                    <button class="clear-input-btn" type="button" aria-label="清除花種搜尋" onclick="clearFlowerComboInput()">×</button>
+                    <div id="flowerComboDropdown" class="flower-combo-dropdown" role="listbox"></div>
+                  </div>
+                  <select id="flowerColorSelect" aria-label="選擇顏色"></select>
+                </div>
               </div>
+              <p class="flower-tip">
+                ※ 花種可直接輸入或從選單選擇，再選顏色。許願白色花朵會隨機跳色，不一定會成功。
+              </p>
+            </label>
 
-              <div class="time-block">
-                <span>結束</span>
-                <select id="endHour"></select>
-                <b>:</b>
-                <select id="endMinute"></select>
+            <label class="time-field">
+              可收花時間區間
+              <div class="time-range">
+                <div class="time-block">
+                  <span>開始</span>
+                  <select id="startHour"></select>
+                  <b>:</b>
+                  <select id="startMinute"></select>
+                </div>
+
+                <div class="time-block">
+                  <span>結束</span>
+                  <select id="endHour"></select>
+                  <b>:</b>
+                  <select id="endMinute"></select>
+                </div>
               </div>
-            </div>
-          </label>
+            </label>
+          </div>
         </div>
 
         <label>
@@ -94,22 +394,39 @@
         <button class="primary-btn" onclick="addWish()">🌱 新增願望卡</button>
       </section>
 
-      <section class="section-title">
-        <h2>🌸 許願區</h2>
+      <section class="section-title collapse-title">
+        <button type="button" class="collapse-btn" data-collapse-target="wishList" aria-expanded="true">
+          <span>🌸 許願區</span>
+          <span class="collapse-icon">▼</span>
+        </button>
+        <div class="order-filter-tabs" data-filter-area="wishList">
+          <button type="button" class="order-filter-btn active" data-filter-target="wishList" data-filter-mode="all">顯示所有訂單</button>
+          <button type="button" class="order-filter-btn" data-filter-target="wishList" data-filter-mode="mine">僅顯示自己發的訂單</button>
+        </div>
       </section>
-      <div id="wishList" class="card-grid"></div>
+      <div id="wishList" class="card-grid collapse-content"></div>
 
-      <section class="section-title">
-        <h2>🌱 待完成區</h2>
+      <section class="section-title collapse-title">
+        <button type="button" class="collapse-btn" data-collapse-target="pendingList" aria-expanded="true">
+          <span>🌱 待完成區</span>
+          <span class="collapse-icon">▼</span>
+        </button>
+        <div class="order-filter-tabs" data-filter-area="pendingList">
+          <button type="button" class="order-filter-btn active" data-filter-target="pendingList" data-filter-mode="all">顯示所有訂單</button>
+          <button type="button" class="order-filter-btn" data-filter-target="pendingList" data-filter-mode="mine">僅顯示自己接的訂單</button>
+        </div>
         <p>大家都看得到進度，但只有接單花農可以按「完成分享」。</p>
       </section>
-      <div id="pendingList" class="card-grid"></div>
+      <div id="pendingList" class="card-grid collapse-content"></div>
 
-      <section class="section-title">
-        <h2>✨ 已完成區</h2>
+      <section class="section-title collapse-title">
+        <button type="button" class="collapse-btn" data-collapse-target="doneList" aria-expanded="true">
+          <span>✨ 已完成區</span>
+          <span class="collapse-icon">▼</span>
+        </button>
         <p>分享地點支援多行座標，完成後 1 小時自動刪除。</p>
       </section>
-      <div id="doneList" class="card-grid"></div>
+      <div id="doneList" class="card-grid collapse-content"></div>
     </section>
 <section id="history" class="page-section">
       <section class="panel">
@@ -146,12 +463,15 @@
 
       <section class="dex-search-panel">
         <div class="dex-search-row">
-          <input
-            id="dexSearchInput"
-            type="text"
-            placeholder="🔍 搜尋花種，例如：玫瑰、櫻花、鬱金香"
-            oninput="renderDex()"
-          />
+          <div class="clearable-input dex-search-wrap">
+            <input
+              id="dexSearchInput"
+              type="text"
+              placeholder="🔍 搜尋花種，例如：玫瑰、櫻花、鬱金香"
+              oninput="renderDex()"
+            />
+            <button class="clear-input-btn" type="button" aria-label="清除圖鑑搜尋" onclick="clearDexSearchInput()">×</button>
+          </div>
           <button id="dexAdvancedBtn" class="dex-advanced-btn" type="button" onclick="toggleDexAdvanced()">進階</button>
         </div>
         <div id="dexAdvancedPanel" class="dex-advanced-panel">
@@ -198,13 +518,48 @@
         </div>
 
         <div class="changelog-grid">
-          <article class="update-card latest">
+<article class="update-card latest">
+            <div class="update-card-head">
+              <div>
+                <div class="update-version">🌸 PikminWish v1.2.0</div>
+                <div class="update-date">2026 / 05 / 26</div>
+              </div>
+              <span class="latest-tag">最新</span>
+            </div>
+
+            <div class="update-section">
+              <h3>🌱 功能新增</h3>
+              <ul>
+                <li>新增大區塊折疊功能</li>
+                <li>新增右下角「回到頂部」按鈕</li>
+                <li>新增「顯示所有訂單 / 僅顯示自己接發的訂單」切換功能</li>
+                <li>新增 DC / LINE 選擇功能</li>
+                <li>新增快速勾選選項功能</li>
+                <li>新增重複許願提醒懸浮視窗</li>
+                <li>新增花農取消接單功能</li>
+                <li>新增花種「輸入 + 下拉式選單」整合功能</li>
+              </ul>
+            </div>
+
+            <div class="update-section">
+              <h3>🛠️ 系統優化</h3>
+              <ul>
+                <li>修正電腦版未顯示「進入網站」按鈕問題</li>
+                <li>優化許願單時間排序邏輯</li>
+                <li>許願單改為三天後自動刪除</li>
+                <li>優化手機版花種選單顯示</li>
+                <li>改善手機版與平板版排版體驗</li>
+                <li>優化區塊切換與按鈕操作體驗</li>
+              </ul>
+            </div>
+          </article>
+
+<article class="update-card">
             <div class="update-card-head">
               <div>
                 <div class="update-version">🌸 PikminWish v1.1.0</div>
                 <div class="update-date">2026 / 05 / 25</div>
               </div>
-              <span class="latest-tag">最新</span>
             </div>
 
             <div class="update-section">
@@ -220,10 +575,10 @@
             </div>
           </article>
 
-          <article class="update-card">
+<article class="update-card">
             <div class="update-card-head">
               <div>
-                <div class="update-version">✨ PikminWish v1.1.0</div>
+                <div class="update-version">✨ PikminWish v1.0.1</div>
                 <div class="update-date">2026 / 05 / 25</div>
               </div>
             </div>
@@ -247,7 +602,7 @@
             </div>
           </article>
 
-          <article class="update-card">
+<article class="update-card">
             <div class="update-card-head">
               <div>
                 <div class="update-version">🌼 PikminWish v1.0.0</div>
@@ -272,8 +627,7 @@
                 <li>支援快速查看花種需求與收藏狀態。</li>
               </ul>
             </div>
-          </article>
-        </div>
+          </article></div>
       </section>
     </section>
 
@@ -301,6 +655,16 @@
         type="text"
         placeholder="採收資訊，例如：印度、8朵、首花時間、隨意收"
       />
+
+
+      <div class="harvest-quick-tags">
+        <button type="button" class="harvest-tag-btn" data-tag="白花/櫻花收">白花/櫻花收</button>
+        <button type="button" class="harvest-tag-btn" data-tag="隨意收">隨意收</button>
+        <button type="button" class="harvest-tag-btn" data-tag="偷田是乞丐">偷田是乞丐</button>
+        <button type="button" class="harvest-tag-btn" data-tag="勿分享">勿分享</button>
+        <button type="button" class="harvest-tag-btn" data-tag="座標已偏移">座標已偏移</button>
+        <button type="button" class="harvest-tag-clear">清空</button>
+      </div>
 
       <textarea
         id="shareLocationInput"
@@ -339,7 +703,7 @@
     </div>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=dropdown-under-input-fix-20260526"></script>
 
   <!-- Firebase -->
   <script type="module">
@@ -416,19 +780,26 @@
     </div>
 
     <div class="nickname-input-wrap">
-      <label>輸入 LINE 社群或Dc暱稱</label>
+      <label>選擇平台並輸入暱稱</label>
 
-      <input
-        type="text"
-        id="gateNicknameInput"
-        placeholder="請輸入 LINE 社群或Dc暱稱"
-      />
+      <div class="nickname-row">
+        <select class="gate-platform-select gate-social-select"  id="socialTypeSelect">
+          <option value="LINE">LINE</option>
+          <option value="DC">DC</option>
+        </select>
+
+        <input
+          type="text"
+          id="gateNicknameInput"
+          placeholder="請輸入暱稱"
+        />
+      </div>
 
       <p class="nickname-tip">
-        ※ 請使用 LINE 社群或Dc暱稱，方便 @提醒
+        ※ 請使用 LINE 社群或 DC 暱稱，方便 @提醒
       </p>
 
-      <button class="enter-btn" onclick="enterWebsite()">
+      <button type="button" id="enterWebsiteBtn" class="enter-btn" onclick="return window.enterWebsite(event)">
         進入網站
       </button>
     </div>
@@ -548,5 +919,160 @@
   });
 </script>
 
+
+<script>
+(function () {
+  function normalizeNickname(name) {
+    return String(name || "").trim().replace(/_(LINE|DC)$/i, "");
+  }
+
+  function closeNicknameGate() {
+    const gate = document.getElementById("nicknameGate");
+    if (!gate) return;
+    gate.classList.add("hidden-gate");
+    gate.style.setProperty("display", "none", "important");
+    gate.style.setProperty("visibility", "hidden", "important");
+    gate.style.setProperty("pointer-events", "none", "important");
+    document.body.style.overflow = "";
+  }
+
+  window.enterWebsite = function (event) {
+    if (event && typeof event.preventDefault === "function") event.preventDefault();
+    if (event && typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+    if (event && typeof event.stopPropagation === "function") event.stopPropagation();
+
+    const input = document.getElementById("gateNicknameInput");
+    const select = document.getElementById("socialTypeSelect");
+    const raw = input ? input.value.trim() : "";
+    const platform = select ? select.value : "LINE";
+
+    if (!raw) {
+      alert("請輸入 LINE 社群或 DC 暱稱");
+      if (input) input.focus();
+      return false;
+    }
+
+    const finalNickname = normalizeNickname(raw) + "_" + platform;
+    localStorage.setItem("flowerWishNickname", finalNickname);
+    window.nickname = finalNickname;
+
+    const mainInput = document.getElementById("nicknameInput");
+    if (mainInput) mainInput.value = finalNickname;
+
+    const currentText = document.getElementById("currentNicknameText");
+    if (currentText) currentText.textContent = finalNickname;
+
+    closeNicknameGate();
+    return false;
+  };
+
+  document.addEventListener("click", function (event) {
+    const btn = event.target.closest && event.target.closest("#enterWebsiteBtn, .enter-btn");
+    if (!btn) return;
+    window.enterWebsite(event);
+  }, true);
+})();
+</script>
+
+
+<script>
+(function () {
+  function splitSavedNicknameForGate(savedNickname) {
+    const text = String(savedNickname || "").trim();
+    const match = text.match(/_(LINE|DC)$/i);
+    return {
+      name: match ? text.replace(/_(LINE|DC)$/i, "") : text,
+      platform: match ? match[1].toUpperCase() : "LINE"
+    };
+  }
+
+  window.openNicknameModal = function () {
+    const gate = document.getElementById("nicknameGate");
+    if (!gate) return false;
+
+    const savedNickname = localStorage.getItem("flowerWishNickname") || "";
+    const parsed = splitSavedNicknameForGate(savedNickname);
+
+    const input = document.getElementById("gateNicknameInput");
+    const select = document.getElementById("socialTypeSelect");
+
+    if (input) input.value = parsed.name;
+    if (select) select.value = parsed.platform;
+
+    gate.classList.remove("hidden-gate");
+    gate.style.setProperty("display", "flex", "important");
+    gate.style.setProperty("visibility", "visible", "important");
+    gate.style.setProperty("pointer-events", "auto", "important");
+    document.body.style.overflow = "hidden";
+
+    setTimeout(function () {
+      if (input) input.focus();
+    }, 80);
+
+    return false;
+  };
+
+  window.openRuleModal = window.openNicknameModal;
+
+  window.updateNicknameDisplay = function () {
+    const currentText = document.getElementById("currentNicknameText");
+    const currentName = localStorage.getItem("flowerWishNickname") || "";
+    if (currentText) currentText.textContent = currentName || "未設定";
+  };
+
+  window.addEventListener("load", function () {
+    window.updateNicknameDisplay();
+  });
+})();
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const harvestInput = document.getElementById("harvestInfoInput");
+  const tagButtons = document.querySelectorAll(".harvest-tag-btn");
+  const clearButton = document.querySelector(".harvest-tag-clear");
+
+  function getCurrentTags() {
+    return harvestInput.value
+      .split("、")
+      .map(tag => tag.trim())
+      .filter(Boolean);
+  }
+
+  function syncButtonStates() {
+    const currentTags = getCurrentTags();
+
+    tagButtons.forEach(btn => {
+      const tag = btn.dataset.tag;
+      btn.classList.toggle("active", currentTags.includes(tag));
+    });
+  }
+
+  tagButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tag = btn.dataset.tag;
+      let currentTags = getCurrentTags();
+
+      if (currentTags.includes(tag)) {
+        currentTags = currentTags.filter(t => t !== tag);
+      } else {
+        currentTags.push(tag);
+      }
+
+      harvestInput.value = currentTags.join("、");
+      syncButtonStates();
+    });
+  });
+
+  clearButton.addEventListener("click", () => {
+    harvestInput.value = "";
+    syncButtonStates();
+  });
+
+  harvestInput.addEventListener("input", syncButtonStates);
+
+  syncButtonStates();
+});
+</script>
 </body>
 </html>

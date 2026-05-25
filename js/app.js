@@ -50,6 +50,41 @@ function getWishKey(item) {
   return item && (typeof item.id !== "undefined" ? item.id : item.firebaseId);
 }
 
+function getWishSortTime(item) {
+  if (!item) return 0;
+
+  const candidates = [
+    item.createdTimestamp,
+    item.createdAtSort,
+    item.createdAt,
+    item.acceptedAt,
+    item.doneAt,
+    item.id,
+    item.firebaseId
+  ];
+
+  for (const value of candidates) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+
+    if (typeof value === "string" && value.trim()) {
+      const normalized = value.trim().replace(/-/g, "/");
+      const parsed = new Date(normalized).getTime();
+      if (!Number.isNaN(parsed)) return parsed;
+
+      const numberValue = Number(value);
+      if (Number.isFinite(numberValue) && numberValue > 0) return numberValue;
+    }
+  }
+
+  return 0;
+}
+
+function sortOldestFirst(items, sortGetter) {
+  return (Array.isArray(items) ? items.slice() : []).sort(function (a, b) {
+    return (sortGetter ? sortGetter(a) : getWishSortTime(a)) - (sortGetter ? sortGetter(b) : getWishSortTime(b));
+  });
+}
+
 function jsValue(value) {
   return JSON.stringify(value);
 }
@@ -136,6 +171,7 @@ let dexActiveFilters = [];
 document.addEventListener("DOMContentLoaded", function () {
   buildTimeOptions();
   loadData();
+  initFlowerPicker();
   fixExampleCardMessageSafely();
   updateLimitInputs();
   renderAll();
@@ -169,6 +205,155 @@ function buildTimeOptions() {
   document.getElementById("endHour").value = "20";
 }
 
+function initFlowerPicker() {
+  const comboInput = document.getElementById("flowerComboInput") || document.getElementById("flowerKeywordInput");
+  const dropdown = document.getElementById("flowerComboDropdown");
+  const colorSelect = document.getElementById("flowerColorSelect");
+  const flowerInput = document.getElementById("flowerInput");
+
+  if (!comboInput || !colorSelect || !flowerInput) return;
+
+  const allColors = ["白", "黃", "紅", "藍"];
+
+  function normalizeText(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function getTypedFlowerName() {
+    return comboInput.value.trim();
+  }
+
+  function findFlowerByName(name) {
+    const normalized = normalizeText(name);
+    return flowerDex.find(function (flower) {
+      return normalizeText(flower.name) === normalized;
+    });
+  }
+
+  function getFilteredFlowers() {
+    const keyword = normalizeText(comboInput.value);
+    if (!keyword) return flowerDex;
+    return flowerDex.filter(function (flower) {
+      const name = normalizeText(flower.name);
+      const subtitle = normalizeText(flower.subtitle || "");
+      return name.includes(keyword) || subtitle.includes(keyword);
+    });
+  }
+
+  function closeDropdown() {
+    if (dropdown) dropdown.classList.remove("open");
+  }
+
+  function renderDropdown() {
+    if (!dropdown) return;
+    const flowers = getFilteredFlowers();
+    dropdown.innerHTML = "";
+
+    if (!flowers.length) {
+      const empty = document.createElement("div");
+      empty.className = "flower-combo-empty";
+      empty.textContent = "沒有符合的花種，可直接輸入自訂花名";
+      dropdown.appendChild(empty);
+      dropdown.classList.add("open");
+      return;
+    }
+
+    flowers.forEach(function (flower) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "flower-combo-option";
+      btn.setAttribute("role", "option");
+      btn.textContent = flower.subtitle ? flower.name + "（" + flower.subtitle + "）" : flower.name;
+      btn.addEventListener("mousedown", function (event) {
+        event.preventDefault();
+        comboInput.value = flower.name;
+        renderColorOptions();
+        closeDropdown();
+      });
+      dropdown.appendChild(btn);
+    });
+
+    dropdown.classList.add("open");
+  }
+
+  function renderColorOptions() {
+    const flowerName = getTypedFlowerName();
+    const selectedFlower = findFlowerByName(flowerName);
+    const currentColor = colorSelect.value;
+    const colors = selectedFlower ? selectedFlower.colors : allColors;
+
+    colorSelect.innerHTML = "";
+    colors.forEach(function (color) {
+      const option = document.createElement("option");
+      option.value = color;
+      option.textContent = color + "色";
+      colorSelect.appendChild(option);
+    });
+
+    if (colors.includes(currentColor)) {
+      colorSelect.value = currentColor;
+    }
+
+    updateSelectedFlowerInput();
+  }
+
+  function updateSelectedFlowerInput() {
+    const flowerName = getTypedFlowerName();
+    const color = colorSelect.value;
+    flowerInput.value = flowerName && color ? color + "色" + flowerName : "";
+  }
+
+  comboInput.oninput = function () {
+    renderDropdown();
+    renderColorOptions();
+  };
+  comboInput.onfocus = function () {
+    renderDropdown();
+  };
+  comboInput.onkeydown = function (event) {
+    if (event.key === "Escape") closeDropdown();
+  };
+  colorSelect.onchange = updateSelectedFlowerInput;
+
+  if (!window.__flowerPickerOutsideClickAdded) {
+    document.addEventListener("mousedown", function (event) {
+      const wrap = document.querySelector(".flower-combo-wrap");
+      if (wrap && !wrap.contains(event.target)) {
+        const menu = document.getElementById("flowerComboDropdown");
+        if (menu) menu.classList.remove("open");
+      }
+    });
+    window.__flowerPickerOutsideClickAdded = true;
+  }
+
+  renderColorOptions();
+}
+function clearFlowerComboInput() {
+  const comboInput = document.getElementById("flowerComboInput") || document.getElementById("flowerKeywordInput");
+  const flowerInput = document.getElementById("flowerInput");
+  if (comboInput) {
+    comboInput.value = "";
+    comboInput.dispatchEvent(new Event("input", { bubbles: true }));
+    comboInput.focus();
+  }
+  if (flowerInput) flowerInput.value = "";
+}
+
+function clearDexSearchInput() {
+  const searchInput = document.getElementById("dexSearchInput");
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.focus();
+  }
+  renderDex();
+}
+
+function resetFlowerPicker() {
+  const comboInput = document.getElementById("flowerComboInput") || document.getElementById("flowerKeywordInput");
+  if (comboInput) comboInput.value = "";
+  initFlowerPicker();
+}
+
 function showSection(sectionId, btn) {
   document.querySelectorAll(".page-section").forEach(function (section) {
     section.classList.remove("active");
@@ -196,7 +381,156 @@ function saveNickname() {
   alert("暱稱已設定：" + nickname);
 }
 
-function addWish() {
+
+
+/* =========================
+   重複許願確認視窗
+========================= */
+let repeatWishResolver = null;
+let repeatWishPendingSubmit = false;
+
+function normalizeRepeatWishText(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function getRepeatWishCount(flower, nickname) {
+  const targetFlower = normalizeRepeatWishText(flower);
+  const targetNickname = normalizeRepeatWishText(nickname);
+  if (!targetFlower || !targetNickname) return 0;
+
+  const activeLists = [];
+  if (Array.isArray(wishes)) activeLists.push(...wishes);
+  if (Array.isArray(pending)) activeLists.push(...pending);
+
+  return activeLists.filter(function (wish) {
+    if (!wish || wish.isExample) return false;
+    const wishStatus = String(wish.status || "wish").toLowerCase();
+    if (wishStatus === "done" || wishStatus === "completed" || wishStatus === "cancelled" || wishStatus === "canceled") return false;
+    return normalizeRepeatWishText(wish.flower) === targetFlower && normalizeRepeatWishText(wish.nickname) === targetNickname;
+  }).length;
+}
+
+function ensureRepeatWishModal() {
+  if (document.getElementById("repeatWishModal")) return;
+
+  const style = document.createElement("style");
+  style.id = "repeatWishModalStyle";
+  style.textContent = `
+    .repeat-wish-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.48);
+      backdrop-filter: blur(3px);
+    }
+    .repeat-wish-modal.show { display: flex; }
+    .repeat-wish-box {
+      width: min(92vw, 420px);
+      border-radius: 22px;
+      padding: 22px 20px 18px;
+      background: linear-gradient(180deg, #fffdf2 0%, #edf8df 100%);
+      color: #28422c;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+      text-align: center;
+      border: 2px solid rgba(128, 169, 82, 0.55);
+    }
+    .repeat-wish-box h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+    .repeat-wish-box p {
+      margin: 0 0 18px;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .repeat-wish-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .repeat-wish-actions button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .repeat-wish-submit {
+      background: #6f9f38;
+      color: white;
+    }
+    .repeat-wish-cancel {
+      background: rgba(255,255,255,0.86);
+      color: #395331;
+      border: 1px solid rgba(75, 111, 52, 0.25) !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  const modal = document.createElement("div");
+  modal.id = "repeatWishModal";
+  modal.className = "repeat-wish-modal";
+  modal.innerHTML = `
+    <div class="repeat-wish-box" role="dialog" aria-modal="true" aria-labelledby="repeatWishTitle">
+      <h3 id="repeatWishTitle">🌸 偵測到重複許願</h3>
+      <p id="repeatWishText">你目前已有相同願望，是否仍要重複許願？</p>
+      <div class="repeat-wish-actions">
+        <button type="button" class="repeat-wish-cancel" id="repeatWishCancelBtn">取消</button>
+        <button type="button" class="repeat-wish-submit" id="repeatWishSubmitBtn">仍然送出</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("repeatWishCancelBtn").addEventListener("click", function () {
+    closeRepeatWishModal(false);
+  });
+  document.getElementById("repeatWishSubmitBtn").addEventListener("click", function () {
+    closeRepeatWishModal(true);
+  });
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) closeRepeatWishModal(false);
+  });
+}
+
+function closeRepeatWishModal(shouldSubmit) {
+  const modal = document.getElementById("repeatWishModal");
+  if (modal) modal.classList.remove("show");
+  repeatWishPendingSubmit = false;
+  if (typeof repeatWishResolver === "function") {
+    const resolver = repeatWishResolver;
+    repeatWishResolver = null;
+    resolver(!!shouldSubmit);
+  }
+}
+
+function askRepeatWishIfNeeded(flower, nickname) {
+  const count = getRepeatWishCount(flower, nickname);
+  if (count <= 0) return Promise.resolve(true);
+  if (repeatWishPendingSubmit) return Promise.resolve(false);
+
+  ensureRepeatWishModal();
+  repeatWishPendingSubmit = true;
+  const text = document.getElementById("repeatWishText");
+  if (text) {
+    text.textContent = `你目前已有 ${count} 筆相同願望，是否仍要重複許願？`;
+  }
+  const modal = document.getElementById("repeatWishModal");
+  if (modal) modal.classList.add("show");
+
+  return new Promise(function (resolve) {
+    repeatWishResolver = resolve;
+  });
+}
+
+async function addWish() {
   const flower = document.getElementById("flowerInput").value.trim();
   const message = document.getElementById("messageInput").value.trim();
 
@@ -212,21 +546,25 @@ function addWish() {
     return;
   }
 
+  const canSubmitRepeatWish = await askRepeatWishIfNeeded(flower, nickname);
+  if (!canSubmitRepeatWish) return;
+
   const start = document.getElementById("startHour").value + ":" + document.getElementById("startMinute").value;
   const end = document.getElementById("endHour").value + ":" + document.getElementById("endMinute").value;
 
-  wishes.unshift({
+  wishes.push({
     id: Date.now(),
     flower: flower,
     nickname: nickname,
     createdAt: formatNow(),
     timeRange: start + " - " + end,
-    deleteAt: getWishDeleteAtFromEndTime(end),
+    deleteAt: getWishDeleteAtThreeDaysLater(),
     message: message || "沒有留言",
     isExample: false
   });
 
   document.getElementById("flowerInput").value = "";
+  resetFlowerPicker();
   document.getElementById("messageInput").value = "";
   saveData();
   renderAll();
@@ -258,6 +596,13 @@ document.addEventListener("click", function (event) {
     return;
   }
 
+  const cancelTakeBtn = event.target.closest(".cancel-take-btn[data-pending-key]");
+  if (cancelTakeBtn && !cancelTakeBtn.disabled) {
+    event.preventDefault();
+    cancelTakeOrder(cancelTakeBtn.dataset.pendingKey);
+    return;
+  }
+
   const likeBtn = event.target.closest(".like-btn[data-done-key]");
   if (likeBtn) {
     event.preventDefault();
@@ -282,6 +627,12 @@ function bindDynamicButtons() {
   document.querySelectorAll(".done-btn[data-pending-key]").forEach(function (btn) {
     btn.onclick = function () {
       openDoneModal(btn.dataset.pendingKey);
+    };
+  });
+
+  document.querySelectorAll(".cancel-take-btn[data-pending-key]").forEach(function (btn) {
+    btn.onclick = function () {
+      cancelTakeOrder(btn.dataset.pendingKey);
     };
   });
 
@@ -433,6 +784,91 @@ function closeDoneModal() {
   document.getElementById("doneModal").classList.remove("show");
 }
 
+function hasSharedCoordinates(item) {
+  if (!item) return false;
+  const candidates = [
+    item.location,
+    item.shareLocation,
+    item.coords,
+    item.coordinate,
+    item.coordinates,
+    item.shareText,
+    item.harvestInfo
+  ];
+  return candidates.some(function (value) {
+    return typeof value === "string" && value.trim();
+  });
+}
+
+async function cancelTakeOrder(id) {
+  const pendingIndex = pending.findIndex(function (item) {
+    return String(getWishKey(item)) === String(id);
+  });
+
+  if (pendingIndex === -1) return;
+
+  const item = pending[pendingIndex];
+
+  if (!isCurrentFarmer(item)) {
+    alert("只有接單花農可以取消接單。");
+    return;
+  }
+
+  if (hasSharedCoordinates(item) || item.status === "done" || item.doneAt) {
+    alert("已送出座標後不能取消接單。");
+    return;
+  }
+
+  const reason = prompt("請輸入取消原因：");
+  if (reason === null) return;
+
+  const cleanReason = reason.trim();
+  if (!cleanReason) {
+    alert("請填寫取消原因，才能取消接單。");
+    return;
+  }
+
+  const ok = confirm("確認取消接單？\n取消後訂單會重新開放，其他花農可以重新接單。");
+  if (!ok) return;
+
+  const returnedWish = pending.splice(pendingIndex, 1)[0];
+  const oldFarmer = returnedWish.farmer || returnedWish.acceptedBy || getCurrentNickname() || "花農";
+
+  returnedWish.cancelReason = cleanReason;
+  returnedWish.lastCancelReason = cleanReason;
+  returnedWish.lastCanceledBy = oldFarmer;
+  returnedWish.lastCanceledAt = formatNow();
+  returnedWish.farmer = "";
+  returnedWish.acceptedBy = "";
+  returnedWish.acceptedAt = "";
+  returnedWish.status = "wish";
+
+  wishes.unshift(returnedWish);
+
+  if (returnedWish.firebaseId && window.firebaseDB && window.firebaseFns) {
+    const { updateDoc, doc } = window.firebaseFns;
+    try {
+      await updateDoc(doc(window.firebaseDB, "wishes", returnedWish.firebaseId), {
+        status: "wish",
+        farmer: "",
+        acceptedBy: "",
+        acceptedAt: "",
+        cancelReason: cleanReason,
+        lastCancelReason: cleanReason,
+        lastCanceledBy: oldFarmer,
+        lastCanceledAt: returnedWish.lastCanceledAt
+      });
+    } catch (error) {
+      console.error("Firebase 取消接單同步失敗", error);
+      alert("本機已取消，但雲端同步失敗。請重新整理後確認訂單狀態。");
+    }
+  }
+
+  saveData();
+  renderAll();
+  alert("已取消接單，訂單重新開放。\n取消原因：" + cleanReason);
+}
+
 
 function previewCleanCoords() {
   const input = document.getElementById("shareLocationInput");
@@ -565,9 +1001,12 @@ function addLocalWishHistory(record) {
   });
 
   if (!exists) {
-    wishHistory.unshift(record);
+    wishHistory.push(record);
   }
 }
+
+let historyPage = 1;
+const HISTORY_PAGE_SIZE = 50;
 
 function renderWishHistory() {
   const list = document.getElementById("wishHistoryList");
@@ -591,9 +1030,34 @@ function renderWishHistory() {
     return;
   }
 
-  list.innerHTML = header + records.map(function (item) {
+  const totalPages = Math.max(1, Math.ceil(records.length / HISTORY_PAGE_SIZE));
+
+  if (historyPage > totalPages) {
+    historyPage = totalPages;
+  }
+
+  const startIndex = (historyPage - 1) * HISTORY_PAGE_SIZE;
+  const pagedRecords = records.slice(startIndex, startIndex + HISTORY_PAGE_SIZE);
+
+  const pagination = totalPages > 1
+    ? `<div class="history-pagination">
+        <button onclick="changeHistoryPage(-1)" ${historyPage === 1 ? "disabled" : ""}>上一頁</button>
+        <span>第 ${historyPage} / ${totalPages} 頁</span>
+        <button onclick="changeHistoryPage(1)" ${historyPage === totalPages ? "disabled" : ""}>下一頁</button>
+      </div>`
+    : "";
+
+  list.innerHTML = header + pagedRecords.map(function (item) {
     return `<div class="wish-history-item">${escapeHtml(item.flower || "花朵")}｜${escapeHtml(item.farmer || "花農")} → ${escapeHtml(item.requester || "許願者")}｜${escapeHtml(item.status || "已完成")}｜${escapeHtml(item.time || "")}</div>`;
-  }).join("");
+  }).join("") + pagination;
+}
+
+function changeHistoryPage(direction) {
+  historyPage += direction;
+
+  if (historyPage < 1) historyPage = 1;
+
+  renderWishHistory();
 }
 
 async function syncWishHistoryToCloud(record) {
@@ -639,7 +1103,7 @@ async function confirmDone() {
   item.likes = 0;
   item.liked = false;
 
-  done.unshift(item);
+  done.push(item);
 
   const historyRecord = makeWishHistoryRecord(item, "已完成");
   addLocalWishHistory(historyRecord);
@@ -672,6 +1136,9 @@ async function confirmDone() {
 
   closeDoneModal();
   document.getElementById("uploadConfirmModal").classList.remove("show");
+
+  alert("⚠️ 提醒：這邊不會自動通知許願者\n請記得把完成分享貼到種花群，讓對方看到喔！");
+
   saveData();
   renderAll();
 }
@@ -695,7 +1162,7 @@ function renderWishes() {
     return;
   }
 
-  wishes.forEach(function (wish) {
+  sortOldestFirst(wishes).forEach(function (wish) {
     const cardClass = wish.isExample ? "card example-card" : "card";
     if (wish.status === "pending" || wish.status === "done") return;
 
@@ -715,19 +1182,9 @@ function renderWishes() {
         <h3>🌸 ${escapeHtml(wish.flower)}</h3>
         <p>👤 暱稱：${escapeHtml(wish.nickname)}</p>
         <p>🕒 發願時間：${escapeHtml(wish.createdAt)}</p>
-        ${wish.isExample ? `
-          <div class="expire-banner">
-            ⏰ 剩餘時間・3小時00分
-          </div>
-        ` : (wish.deleteAt ? `
-          <div class="${isEndingSoon(wish.deleteAt) ? "expire-banner warning" : "expire-banner"}">
-            ${isEndingSoon(wish.deleteAt) ? "⚠️ 即將結束" : "⏰ 剩餘時間"}
-            ・${formatRemainTime(wish.deleteAt)}
-          </div>
-        ` : "")}
-
         <p>🌙 可收花時間：${escapeHtml(wish.timeRange)}</p>
         <p>💬 ${escapeHtml(wish.message)}</p>
+        ${wish.lastCancelReason || wish.cancelReason ? `<p class="hint cancel-reason">上次取消原因：${escapeHtml(wish.lastCancelReason || wish.cancelReason)}</p>` : ""}
         ${actionButton}
       </article>
     `;
@@ -743,10 +1200,11 @@ function renderPending() {
     return;
   }
 
-  pending.forEach(function (item) {
+  sortOldestFirst(pending).forEach(function (item) {
     const canComplete = isCurrentFarmer(item);
+    const pendingKey = escapeHtml(getWishKey(item));
     const actionButton = canComplete
-      ? `<button class="done-btn" type="button" data-pending-key="${escapeHtml(getWishKey(item))}">完成分享</button>`
+      ? `<div class="pending-actions"><button class="done-btn" type="button" data-pending-key="${pendingKey}">完成分享</button><button class="cancel-take-btn" type="button" data-pending-key="${pendingKey}">取消接單</button></div>`
       : `<button class="done-btn disabled-btn" type="button" disabled>等待花農完成分享</button>`;
 
     list.innerHTML += `
@@ -777,7 +1235,7 @@ function renderDone() {
     return;
   }
 
-  done.forEach(function (item) {
+  sortOldestFirst(done, function (item) { return item.doneAt || getWishSortTime(item); }).forEach(function (item) {
     if (typeof item.id === "undefined") item.id = item.firebaseId || Date.now();
     if (typeof item.likes === "undefined") item.likes = 0;
     const doneKey = getWishKey(item);
@@ -1169,6 +1627,10 @@ function getColorEmoji(color) {
   return map[color] || "🌸";
 }
 
+
+function getWishDeleteAtThreeDaysLater() {
+  return Date.now() + (3 * 24 * 60 * 60 * 1000);
+}
 
 function getWishDeleteAtFromEndTime(endTime) {
   const now = new Date();
@@ -1641,6 +2103,9 @@ async function startFirebaseSync() {
       return;
     }
 
+    const canSubmitRepeatWish = await askRepeatWishIfNeeded(flower, nickname);
+    if (!canSubmitRepeatWish) return;
+
     const startHour = document.getElementById("startHour")?.value || "14";
     const startMinute = document.getElementById("startMinute")?.value || "00";
     const endHour = document.getElementById("endHour")?.value || "20";
@@ -1656,7 +2121,7 @@ async function startFirebaseSync() {
       createdAt: now.toLocaleString(),
       timeRange: `${startHour}:${startMinute} - ${endHour}:${endMinute}`,
       message,
-      deleteAt: getWishDeleteAtFromEndTime(`${endHour}:${endMinute}`),
+      deleteAt: getWishDeleteAtThreeDaysLater(),
       createdTimestamp: Date.now(),
       status: "wish"
     };
@@ -1697,13 +2162,17 @@ async function startFirebaseSync() {
 
 function enterWebsite() {
   const input = document.getElementById("gateNicknameInput");
-  nickname = input.value.trim();
+  const socialSelect = document.getElementById("socialTypeSelect");
+  const rawNickname = input ? input.value.trim() : "";
+  const platform = socialSelect ? socialSelect.value : "LINE";
 
-  if (!nickname) {
-    alert("請輸入 LINE 社群暱稱");
+  if (!rawNickname) {
+    alert("請輸入 LINE 社群或 DC 暱稱");
     return;
   }
 
+  const cleanNickname = rawNickname.replace(/_(LINE|DC)$/i, "");
+  nickname = `${cleanNickname}_${platform}`;
   localStorage.setItem("flowerWishNickname", nickname);
 
   const nicknameInput = document.getElementById("nicknameInput");
@@ -1711,9 +2180,19 @@ function enterWebsite() {
     nicknameInput.value = nickname;
   }
 
-  document.getElementById("nicknameGate").classList.add("hidden-gate");
+  const gate = document.getElementById("nicknameGate");
+  if (gate) {
+    gate.classList.add("hidden-gate");
+    gate.style.display = "none";
+    gate.style.visibility = "hidden";
+    gate.style.pointerEvents = "none";
+  }
 
-  if (window.firebaseDB && window.firebaseFns) {
+  if (typeof updateNicknameDisplay === "function") {
+    updateNicknameDisplay();
+  }
+
+  if (window.firebaseDB && window.firebaseFns && typeof loadDexFromCloud === "function") {
     loadDexFromCloud(nickname);
   }
 }
@@ -1785,3 +2264,472 @@ enterWebsite = async function(...args) {
 window.addEventListener("load", () => {
   setTimeout(updateNicknameDisplay, 300);
 });
+
+
+/* ===== 區塊折疊：只套用許願區 / 待完成區 / 已完成區 ===== */
+function setCollapseHeight(el) {
+  if (!el || el.classList.contains("is-collapsed")) return;
+  el.style.maxHeight = el.scrollHeight + "px";
+}
+
+function refreshCollapseHeights() {
+  document.querySelectorAll(".collapse-content").forEach(setCollapseHeight);
+}
+
+function initCollapseBlocks() {
+  document.querySelectorAll(".collapse-btn").forEach(function (btn) {
+    if (btn.dataset.collapseReady === "1") return;
+    btn.dataset.collapseReady = "1";
+
+    btn.addEventListener("click", function () {
+      const targetId = btn.getAttribute("data-collapse-target");
+      const target = document.getElementById(targetId);
+      const icon = btn.querySelector(".collapse-icon");
+      if (!target) return;
+
+      if (target.classList.contains("is-collapsed")) {
+        target.classList.remove("is-collapsed");
+        target.style.maxHeight = target.scrollHeight + "px";
+        btn.setAttribute("aria-expanded", "true");
+        if (icon) icon.textContent = "▼";
+      } else {
+        target.style.maxHeight = target.scrollHeight + "px";
+        requestAnimationFrame(function () {
+          target.classList.add("is-collapsed");
+          target.style.maxHeight = "0px";
+        });
+        btn.setAttribute("aria-expanded", "false");
+        if (icon) icon.textContent = "▶";
+      }
+    });
+  });
+
+  refreshCollapseHeights();
+
+  ["wishList", "pendingList", "doneList"].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.collapseObserved === "1") return;
+    el.dataset.collapseObserved = "1";
+    new MutationObserver(refreshCollapseHeights).observe(el, { childList: true, subtree: true });
+  });
+}
+
+window.addEventListener("load", initCollapseBlocks);
+window.addEventListener("resize", refreshCollapseHeights);
+document.addEventListener("DOMContentLoaded", initCollapseBlocks);
+
+
+/* ===== 回到頂部按鈕 ===== */
+function initBackToTopBtn() {
+  const btn = document.getElementById("backToTopBtn");
+  if (!btn || btn.dataset.ready === "1") return;
+
+  btn.dataset.ready = "1";
+  btn.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+    document.body.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initBackToTopBtn);
+window.addEventListener("load", initBackToTopBtn);
+
+
+
+
+
+
+
+
+/* ===== 訂單顯示篩選 ===== */
+window.orderFilterState = window.orderFilterState || {
+  wishList: "all",
+  pendingList: "all"
+};
+
+function getCurrentPikminUserName() {
+  return (localStorage.getItem("flowerWishNickname") || "").trim();
+}
+
+function normalizeOrderText(text) {
+  return String(text || "").replace(/\s+/g, "");
+}
+
+function getFieldValueFromCard(card, labels) {
+  const text = normalizeOrderText(card.innerText || card.textContent || "");
+
+  for (const label of labels) {
+    const key = normalizeOrderText(label);
+    const start = text.indexOf(key);
+    if (start === -1) continue;
+
+    const after = text.slice(start + key.length);
+    const nextStop = after.search(/(花朵|花種|顏色|許願者|接單花農|花農|是否完成|時間|座標|完成分享|取消|刪除|我可以幫忙|確認接單|已接單)/);
+    return nextStop === -1 ? after : after.slice(0, nextStop);
+  }
+
+  return "";
+}
+
+function orderCardBelongsToMe(card, listId, currentName) {
+  if (!card || !currentName) return false;
+
+  const cleanName = normalizeOrderText(currentName);
+
+  if (listId === "wishList") {
+    const wishOwner = getFieldValueFromCard(card, ["許願者：", "許願者", "暱稱：", "暱稱"]);
+    return normalizeOrderText(wishOwner).includes(cleanName);
+  }
+
+  if (listId === "pendingList") {
+    const farmer = getFieldValueFromCard(card, ["接單花農：", "接單花農", "花農：", "花農"]);
+    return normalizeOrderText(farmer).includes(cleanName);
+  }
+
+  return false;
+}
+
+function applyOrderFilter(listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+
+  const mode = window.orderFilterState[listId] || "all";
+  const cards = Array.from(list.children).filter(function (el) {
+    return !el.classList.contains("order-filter-empty");
+  });
+
+  list.querySelectorAll(".order-filter-empty").forEach(function (el) {
+    el.remove();
+  });
+
+  if (mode === "all") {
+    cards.forEach(function (card) {
+      card.style.display = "";
+    });
+    if (typeof refreshCollapseHeights === "function") refreshCollapseHeights();
+    return;
+  }
+
+  const currentName = getCurrentPikminUserName();
+
+  if (!currentName) {
+    cards.forEach(function (card) {
+      card.style.display = "none";
+    });
+    const empty = document.createElement("div");
+    empty.className = "order-filter-empty";
+    empty.textContent = "尚未設定暱稱，無法篩選自己的訂單。";
+    list.appendChild(empty);
+    if (typeof refreshCollapseHeights === "function") refreshCollapseHeights();
+    return;
+  }
+
+  let shown = 0;
+  cards.forEach(function (card) {
+    const ok = orderCardBelongsToMe(card, listId, currentName);
+    card.style.display = ok ? "" : "none";
+    if (ok) shown++;
+  });
+
+  if (shown === 0) {
+    const empty = document.createElement("div");
+    empty.className = "order-filter-empty";
+    empty.textContent = listId === "wishList" ? "目前沒有自己發的訂單。" : "目前沒有自己接的訂單。";
+    list.appendChild(empty);
+  }
+
+  if (typeof refreshCollapseHeights === "function") refreshCollapseHeights();
+}
+
+function syncOrderFilterButtons(listId) {
+  document.querySelectorAll('.order-filter-btn[data-filter-target="' + listId + '"]').forEach(function (btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-filter-mode") === (window.orderFilterState[listId] || "all"));
+  });
+}
+
+function initOrderFilters() {
+  // 事件委派：按鈕即使重繪也能按
+  if (document.body.dataset.orderFilterClickReady !== "1") {
+    document.body.dataset.orderFilterClickReady = "1";
+
+    document.body.addEventListener("click", function (event) {
+      const btn = event.target.closest(".order-filter-btn");
+      if (!btn) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const listId = btn.getAttribute("data-filter-target");
+      const mode = btn.getAttribute("data-filter-mode") || "all";
+      if (!listId) return;
+
+      window.orderFilterState[listId] = mode;
+      syncOrderFilterButtons(listId);
+      applyOrderFilter(listId);
+    }, true);
+  }
+
+  ["wishList", "pendingList"].forEach(function (id) {
+    syncOrderFilterButtons(id);
+    applyOrderFilter(id);
+
+    const list = document.getElementById(id);
+    if (!list || list.dataset.orderFilterObserved === "1") return;
+
+    list.dataset.orderFilterObserved = "1";
+    new MutationObserver(function (mutations) {
+      // 避免自己新增空狀態時重複觸發到卡住
+      const hasRealCardChange = mutations.some(function (m) {
+        return Array.from(m.addedNodes).concat(Array.from(m.removedNodes)).some(function (node) {
+          return node.nodeType === 1 && !node.classList.contains("order-filter-empty");
+        });
+      });
+
+      if (hasRealCardChange) {
+        applyOrderFilter(id);
+      }
+    }).observe(list, { childList: true });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initOrderFilters);
+window.addEventListener("load", initOrderFilters);
+setTimeout(initOrderFilters, 500);
+
+
+window.enterWebsite = enterWebsite;
+
+document.addEventListener("DOMContentLoaded", function () {
+  const enterBtn = null; // disabled duplicate enter handler; index.html uses robust handler
+  if (enterBtn) {
+    enterBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      enterWebsite();
+    });
+  }
+});
+
+
+/* ===== FIX: 進站後「修改暱稱」可重新開啟 ===== */
+function splitSavedNicknameForGate(savedNickname) {
+  const text = String(savedNickname || "").trim();
+  const match = text.match(/_(LINE|DC)$/i);
+  return {
+    name: match ? text.replace(/_(LINE|DC)$/i, "") : text,
+    platform: match ? match[1].toUpperCase() : "LINE"
+  };
+}
+
+function showNicknameGateForEdit() {
+  const gate = document.getElementById("nicknameGate");
+  if (!gate) return;
+
+  const savedNickname = localStorage.getItem("flowerWishNickname") || "";
+  const parsed = splitSavedNicknameForGate(savedNickname);
+
+  const input = document.getElementById("gateNicknameInput");
+  const select = document.getElementById("socialTypeSelect");
+
+  if (input) input.value = parsed.name;
+  if (select) select.value = parsed.platform;
+
+  gate.classList.remove("hidden-gate");
+  gate.style.setProperty("display", "flex", "important");
+  gate.style.setProperty("visibility", "visible", "important");
+  gate.style.setProperty("pointer-events", "auto", "important");
+  document.body.style.overflow = "hidden";
+
+  setTimeout(function () {
+    if (input) input.focus();
+  }, 80);
+}
+
+window.openNicknameModal = showNicknameGateForEdit;
+window.openRuleModal = showNicknameGateForEdit;
+
+function updateCurrentNicknameBar() {
+  const nicknameText = document.getElementById("currentNicknameText");
+  if (!nicknameText) return;
+  const currentName = localStorage.getItem("flowerWishNickname") || nickname || "";
+  nicknameText.textContent = currentName || "未設定";
+}
+
+window.updateCurrentNicknameBar = updateCurrentNicknameBar;
+
+
+
+/* ===== FORCE JS FIX: move nickname badge below title ===== */
+(function () {
+  function moveNicknameBarBelowTitle() {
+    const bar = document.getElementById("currentNicknameBar") ||
+      document.querySelector(".current-nickname-bar, .nickname-status, .nickname-pill");
+    const title = document.querySelector(".hero-title, .main-title, .site-title, .hero h1, h1");
+    if (!bar || !title) return;
+
+    bar.style.position = "relative";
+    bar.style.left = "auto";
+    bar.style.right = "auto";
+    bar.style.top = "auto";
+    bar.style.bottom = "auto";
+    bar.style.transform = "none";
+    bar.style.margin = "16px auto 0";
+    bar.style.zIndex = "1";
+
+    if (title.nextElementSibling !== bar) {
+      title.insertAdjacentElement("afterend", bar);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", moveNicknameBarBelowTitle);
+  window.addEventListener("load", moveNicknameBarBelowTitle);
+  setTimeout(moveNicknameBarBelowTitle, 300);
+})();
+
+
+
+/* ===== DEPLOY FIX: 花種同一格輸入＋下拉，修正上傳後選單被擋/沒顯示 ===== */
+(function () {
+  function normalizeFlowerText(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function getFlowerSourceList() {
+    try {
+      if (Array.isArray(flowerDex) && flowerDex.length) return flowerDex;
+    } catch (e) {}
+    try {
+      if (Array.isArray(DEFAULT_FLOWER_DEX) && DEFAULT_FLOWER_DEX.length) return DEFAULT_FLOWER_DEX;
+    } catch (e) {}
+    return [];
+  }
+
+  function applyDropdownPosition(input, dropdown) {
+    if (!input || !dropdown) return;
+    const wrap = input.closest(".flower-combo-wrap") || input.parentElement;
+    if (wrap && dropdown.parentElement !== wrap) {
+      wrap.appendChild(dropdown);
+    }
+    if (wrap) {
+      wrap.style.position = "relative";
+      wrap.style.overflow = "visible";
+    }
+    dropdown.style.position = "absolute";
+    dropdown.style.left = "0";
+    dropdown.style.right = "auto";
+    dropdown.style.top = (input.offsetHeight + 6) + "px";
+    dropdown.style.width = input.offsetWidth + "px";
+    dropdown.style.maxHeight = "260px";
+    dropdown.style.zIndex = "999999";
+    dropdown.style.transform = "none";
+  }
+
+  function installFlowerDeployDropdownFix() {
+    const input = document.getElementById("flowerComboInput") || document.getElementById("flowerKeywordInput");
+    const dropdown = document.getElementById("flowerComboDropdown");
+    const colorSelect = document.getElementById("flowerColorSelect");
+    const hiddenInput = document.getElementById("flowerInput");
+    if (!input || !dropdown || !colorSelect || !hiddenInput) return;
+
+    if (input.dataset.deployDropdownFixed === "1") return;
+    input.dataset.deployDropdownFixed = "1";
+
+    const defaultColors = ["白", "黃", "紅", "藍"];
+
+    function findFlower(name) {
+      const key = normalizeFlowerText(name);
+      return getFlowerSourceList().find(function (flower) {
+        return normalizeFlowerText(flower.name) === key;
+      });
+    }
+
+    function updateHiddenValue() {
+      const name = input.value.trim();
+      const color = colorSelect.value;
+      hiddenInput.value = name && color ? color + "色" + name : "";
+    }
+
+    function renderColors() {
+      const current = colorSelect.value;
+      const found = findFlower(input.value);
+      const colors = found && Array.isArray(found.colors) && found.colors.length ? found.colors : defaultColors;
+      colorSelect.innerHTML = "";
+      colors.forEach(function (color) {
+        const option = document.createElement("option");
+        option.value = color;
+        option.textContent = color + "色";
+        colorSelect.appendChild(option);
+      });
+      if (colors.includes(current)) colorSelect.value = current;
+      updateHiddenValue();
+    }
+
+    function closeDropdown() {
+      dropdown.classList.remove("open");
+      dropdown.style.display = "none";
+    }
+
+    function openDropdown() {
+      const keyword = normalizeFlowerText(input.value);
+      const flowers = getFlowerSourceList().filter(function (flower) {
+        const name = normalizeFlowerText(flower.name);
+        const subtitle = normalizeFlowerText(flower.subtitle || "");
+        return !keyword || name.includes(keyword) || subtitle.includes(keyword);
+      });
+
+      dropdown.innerHTML = "";
+
+      if (!flowers.length) {
+        const empty = document.createElement("div");
+        empty.className = "flower-combo-empty";
+        empty.textContent = "沒有符合的花種，可直接輸入自訂花名";
+        dropdown.appendChild(empty);
+      } else {
+        flowers.forEach(function (flower) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "flower-combo-option";
+          btn.textContent = flower.subtitle ? flower.name + "（" + flower.subtitle + "）" : flower.name;
+          btn.addEventListener("mousedown", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            input.value = flower.name;
+            renderColors();
+            closeDropdown();
+          });
+          dropdown.appendChild(btn);
+        });
+      }
+
+      applyDropdownPosition(input, dropdown);
+      dropdown.style.display = "block";
+      dropdown.classList.add("open");
+    }
+
+    input.addEventListener("focus", openDropdown);
+    input.addEventListener("click", openDropdown);
+    input.addEventListener("input", function () {
+      renderColors();
+      openDropdown();
+    });
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeDropdown();
+    });
+    colorSelect.addEventListener("change", updateHiddenValue);
+
+    window.addEventListener("resize", function () {
+      if (dropdown.classList.contains("open")) applyDropdownPosition(input, dropdown);
+    });
+
+    document.addEventListener("mousedown", function (event) {
+      if (event.target === input || dropdown.contains(event.target)) return;
+      closeDropdown();
+    });
+
+    renderColors();
+  }
+
+  document.addEventListener("DOMContentLoaded", installFlowerDeployDropdownFix);
+  window.addEventListener("load", installFlowerDeployDropdownFix);
+  setTimeout(installFlowerDeployDropdownFix, 300);
+})();
