@@ -2291,3 +2291,144 @@ label textarea {
     box-shadow:none !important;
   }
 }
+
+
+
+
+/* ===== v1.0.1 手機板實際修正：圖鑑進階選項 + footer ===== */
+@media (max-width: 768px){
+
+  /* footer 整體縮小 */
+  .footer{
+    padding: 10px 8px 14px !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+  .footer > div:first-child{
+    font-size: 10.5px !important;
+    line-height: 1.45 !important;
+    margin-bottom: 6px !important;
+    padding: 0 6px !important;
+  }
+
+  .footer-action-row,
+  .footer-link-row{
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    width: 100% !important;
+    max-width: 285px !important;
+    margin: 6px auto 6px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .footer-pill-btn,
+  .terms-footer-btn,
+  .footer-social-btn{
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 25px !important;
+    height: 25px !important;
+    padding: 0 5px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+  }
+
+  .footer > div:last-child{
+    font-size: 10.5px !important;
+    line-height: 1.45 !important;
+  }
+
+  /* 花朵圖鑑搜尋卡片縮小 */
+  .dex-search-panel{
+    padding: 12px 8px !important;
+    border-radius: 18px !important;
+  }
+
+  .dex-search-panel h2{
+    font-size: 22px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .dex-search-panel p{
+    font-size: 10.5px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .dex-search-row{
+    display: grid !important;
+    grid-template-columns: 1fr 66px !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  .dex-search-panel input{
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+    border-radius: 12px !important;
+  }
+
+  /* 進階按鈕真的縮小 */
+  .dex-advanced-btn,
+  button.dex-advanced-btn{
+    width: 66px !important;
+    min-width: 66px !important;
+    max-width: 66px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    font-size: 10.5px !important;
+    line-height: 1 !important;
+    border-radius: 12px !important;
+  }
+
+  /* 進階面板縮小 */
+  .dex-advanced-panel{
+    padding: 8px !important;
+    margin-top: 8px !important;
+    border-radius: 14px !important;
+  }
+
+  .dex-filter-line{
+    display: grid !important;
+    grid-template-columns: 58px 1fr !important;
+    gap: 5px !important;
+    align-items: start !important;
+    padding: 6px 0 !important;
+  }
+
+  .dex-filter-label{
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    min-width: 0 !important;
+    padding-top: 5px !important;
+  }
+
+  .dex-filter-group{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    width: 100% !important;
+  }
+
+  /* 選項按鈕縮小成兩欄，節省垂直空間 */
+  .dex-filter-btn{
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 24px !important;
+    height: 24px !important;
+    padding: 0 5px !important;
+    font-size: 9.8px !important;
+    line-height: 1 !important;
+    border-radius: 9px !important;
+    white-space: nowrap !important;
+  }
+}
