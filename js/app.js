@@ -128,6 +128,8 @@ const DEFAULT_FLOWER_DEX = [
 ];
 
 let flowerDex = JSON.parse(JSON.stringify(DEFAULT_FLOWER_DEX));
+let dexFilterMode = "all";
+let dexActiveFilters = [];
 
 document.addEventListener("DOMContentLoaded", function () {
   buildTimeOptions();
@@ -709,10 +711,17 @@ function renderDex() {
   const searchInput = document.getElementById("dexSearchInput");
   const keyword = searchInput ? searchInput.value.trim() : "";
 
+  if (!list) return;
+
   list.innerHTML = "";
+  updateDexFilterButtons();
 
   const filteredDex = flowerDex.filter(function (flower) {
-    return flower.name.includes(keyword);
+    if (keyword && !flower.name.includes(keyword)) return false;
+
+    return flower.colors.some(function (color) {
+      return isDexRowMatchingFilter(flower.name, color);
+    });
   });
 
   if (filteredDex.length === 0) {
@@ -733,6 +742,8 @@ function renderDex() {
 
       const essence = Number(safeGetLocalStorage(essenceKey) || 0);
       const petal = Number(safeGetLocalStorage(petalKey) || 0);
+
+      if (!isDexRowMatchingFilter(flower.name, color)) return;
 
       rows += `
         <tr>
@@ -796,6 +807,93 @@ function renderDex() {
         </div>
       </div>
     `;
+  });
+}
+
+
+function getDexFilterGroup(mode) {
+  if (["missing", "full", "essence", "petal"].includes(mode)) return "status";
+  if (["white", "yellow", "red", "blue"].includes(mode)) return "color";
+  if (["forget", "rose"].includes(mode)) return "monthly";
+  return "all";
+}
+
+function getDexActiveFilterGroups() {
+  const groups = { status: [], color: [], monthly: [] };
+
+  dexActiveFilters.forEach(function (mode) {
+    const group = getDexFilterGroup(mode);
+    if (groups[group]) groups[group].push(mode);
+  });
+
+  return groups;
+}
+
+function isDexRowMatchingFilter(flowerName, color) {
+  if (!Array.isArray(dexActiveFilters) || dexActiveFilters.length === 0) return true;
+
+  const essence = Number(safeGetLocalStorage(`dex_${flowerName}_${color}_essence`) || 0);
+  const petal = Number(safeGetLocalStorage(`dex_${flowerName}_${color}_petal`) || 0);
+  const isFull = essence >= essenceLimit && petal >= petalLimit;
+  const filters = getDexActiveFilterGroups();
+
+  const statusOk = filters.status.length === 0 || filters.status.some(function (mode) {
+    if (mode === "missing") return !isFull;
+    if (mode === "full") return isFull;
+    if (mode === "essence") return essence < essenceLimit;
+    if (mode === "petal") return petal < petalLimit;
+    return true;
+  });
+
+  const colorMap = { white: "白", yellow: "黃", red: "紅", blue: "藍" };
+  const colorOk = filters.color.length === 0 || filters.color.some(function (mode) {
+    return color.includes(colorMap[mode]);
+  });
+
+  const monthlyOk = filters.monthly.length === 0 || filters.monthly.some(function (mode) {
+    if (mode === "forget") return flowerName.includes("勿忘草");
+    if (mode === "rose") return flowerName.includes("週年玫瑰") || flowerName.includes("周年玫瑰") || flowerName.includes("周年紀念玫瑰");
+    return true;
+  });
+
+  return statusOk && colorOk && monthlyOk;
+}
+
+function toggleDexAdvanced() {
+  const panel = document.getElementById("dexAdvancedPanel");
+  const btn = document.getElementById("dexAdvancedBtn");
+  if (!panel) return;
+
+  const isOpen = panel.classList.toggle("open");
+  if (btn) btn.classList.toggle("active", isOpen);
+}
+
+function setDexFilter(mode) {
+  mode = mode || "all";
+
+  if (mode === "all") {
+    dexActiveFilters = [];
+  } else {
+    dexActiveFilters = Array.isArray(dexActiveFilters) ? dexActiveFilters : [];
+    if (dexActiveFilters.includes(mode)) {
+      dexActiveFilters = dexActiveFilters.filter(function (item) { return item !== mode; });
+    } else {
+      dexActiveFilters.push(mode);
+    }
+  }
+
+  dexFilterMode = dexActiveFilters.length ? dexActiveFilters.join(",") : "all";
+  safeSetLocalStorage("flowerDexActiveFilters", JSON.stringify(dexActiveFilters));
+  safeSetLocalStorage("flowerDexFilterMode", dexFilterMode);
+  renderDex();
+}
+
+function updateDexFilterButtons() {
+  dexActiveFilters = Array.isArray(dexActiveFilters) ? dexActiveFilters : [];
+
+  document.querySelectorAll(".dex-filter-btn").forEach(function (btn) {
+    const mode = btn.dataset.filter;
+    btn.classList.toggle("active", mode === "all" ? dexActiveFilters.length === 0 : dexActiveFilters.includes(mode));
   });
 }
 
@@ -1018,6 +1116,20 @@ function loadData() {
   const savedDone = safeGetLocalStorage("flowerWishDone");
   essenceLimit = Number(safeGetLocalStorage("flowerWishEssenceLimit") || 1200);
   petalLimit = Number(safeGetLocalStorage("flowerWishPetalLimit") || 1200);
+  try {
+    dexActiveFilters = JSON.parse(safeGetLocalStorage("flowerDexActiveFilters") || "[]");
+  } catch (error) {
+    dexActiveFilters = [];
+  }
+
+  if (!Array.isArray(dexActiveFilters)) dexActiveFilters = [];
+
+  const oldDexFilterMode = safeGetLocalStorage("flowerDexFilterMode") || "all";
+  if (dexActiveFilters.length === 0 && oldDexFilterMode !== "all" && !oldDexFilterMode.includes(",")) {
+    dexActiveFilters = [oldDexFilterMode];
+  }
+
+  dexFilterMode = dexActiveFilters.length ? dexActiveFilters.join(",") : "all";
 
   if (savedWishes) wishes = JSON.parse(savedWishes);
   if (savedPending) pending = JSON.parse(savedPending);

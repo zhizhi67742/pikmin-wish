@@ -121,12 +121,43 @@
       </section>
 
       <section class="dex-search-panel">
-        <input
-          id="dexSearchInput"
-          type="text"
-          placeholder="🔍 搜尋花種，例如：玫瑰、櫻花、鬱金香"
-          oninput="renderDex()"
-        />
+        <div class="dex-search-row">
+          <input
+            id="dexSearchInput"
+            type="text"
+            placeholder="🔍 搜尋花種，例如：玫瑰、櫻花、鬱金香"
+            oninput="renderDex()"
+          />
+          <button id="dexAdvancedBtn" class="dex-advanced-btn" type="button" onclick="toggleDexAdvanced()">進階</button>
+        </div>
+        <div id="dexAdvancedPanel" class="dex-advanced-panel">
+          <div class="dex-filter-line">
+            <span class="dex-filter-label">缺花狀態</span>
+            <div class="dex-filter-group">
+              <button class="dex-filter-btn active" type="button" data-filter="all" onclick="setDexFilter('all')">全部</button>
+              <button class="dex-filter-btn" type="button" data-filter="missing" onclick="setDexFilter('missing')">只看缺花</button>
+              <button class="dex-filter-btn" type="button" data-filter="full" onclick="setDexFilter('full')">只看已滿</button>
+              <button class="dex-filter-btn" type="button" data-filter="essence" onclick="setDexFilter('essence')">只缺精華</button>
+              <button class="dex-filter-btn" type="button" data-filter="petal" onclick="setDexFilter('petal')">只缺花瓣</button>
+            </div>
+          </div>
+          <div class="dex-filter-line">
+            <span class="dex-filter-label">顏色分類</span>
+            <div class="dex-filter-group">
+              <button class="dex-filter-btn" type="button" data-filter="white" onclick="setDexFilter('white')">🤍 白</button>
+              <button class="dex-filter-btn" type="button" data-filter="yellow" onclick="setDexFilter('yellow')">💛 黃</button>
+              <button class="dex-filter-btn" type="button" data-filter="red" onclick="setDexFilter('red')">❤️ 紅</button>
+              <button class="dex-filter-btn" type="button" data-filter="blue" onclick="setDexFilter('blue')">💙 藍</button>
+            </div>
+          </div>
+          <div class="dex-filter-line">
+            <span class="dex-filter-label">本月花朵</span>
+            <div class="dex-filter-group">
+              <button class="dex-filter-btn special-filter" type="button" data-filter="forget" onclick="setDexFilter('forget')">🌸 本月新花</button>
+              <button class="dex-filter-btn special-filter" type="button" data-filter="rose" onclick="setDexFilter('rose')">🌹 本月副花</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <div id="flowerDexList" class="dex-list"></div>
@@ -146,7 +177,7 @@
           <article class="update-card latest">
             <div class="update-card-head">
               <div>
-                <div class="update-version">✨ PikminWish v1.0.1</div>
+                <div class="update-version">✨ PikminWish v1.1</div>
                 <div class="update-date">2026 / 05 / 25</div>
               </div>
               <span class="latest-tag">最新</span>
@@ -366,7 +397,7 @@
   </div>
 
   <div>
-    梔梔製作 v1.0.1 ｜ 許願池及花朵圖鑑
+    © 2026 梔梔 v1.1 ｜ 許願池及花朵圖鑑
   </div>
 </div>
 </body>
