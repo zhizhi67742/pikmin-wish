@@ -136,7 +136,6 @@ let dexActiveFilters = [];
 document.addEventListener("DOMContentLoaded", function () {
   buildTimeOptions();
   loadData();
-  initFlowerPicker();
   fixExampleCardMessageSafely();
   updateLimitInputs();
   renderAll();
@@ -168,94 +167,6 @@ function buildTimeOptions() {
 
   document.getElementById("startHour").value = "14";
   document.getElementById("endHour").value = "20";
-}
-
-function initFlowerPicker() {
-  const keywordInput = document.getElementById("flowerKeywordInput");
-  const flowerSelect = document.getElementById("flowerSelect");
-  const colorSelect = document.getElementById("flowerColorSelect");
-  const flowerInput = document.getElementById("flowerInput");
-
-  if (!keywordInput || !flowerSelect || !colorSelect || !flowerInput) return;
-
-  function normalizeText(value) {
-    return String(value || "").trim().toLowerCase();
-  }
-
-  function renderFlowerOptions() {
-    const keyword = normalizeText(keywordInput.value);
-    const current = flowerSelect.value;
-    const matchedFlowers = flowerDex.filter(function (flower) {
-      const name = normalizeText(flower.name);
-      const subtitle = normalizeText(flower.subtitle || "");
-      return !keyword || name.includes(keyword) || subtitle.includes(keyword);
-    });
-
-    flowerSelect.innerHTML = "";
-
-    if (!matchedFlowers.length) {
-      const emptyOption = document.createElement("option");
-      emptyOption.value = "";
-      emptyOption.textContent = "找不到花種";
-      flowerSelect.appendChild(emptyOption);
-      colorSelect.innerHTML = "";
-      flowerInput.value = "";
-      return;
-    }
-
-    matchedFlowers.forEach(function (flower) {
-      const option = document.createElement("option");
-      option.value = flower.name;
-      option.textContent = flower.subtitle ? flower.name + "（" + flower.subtitle + "）" : flower.name;
-      flowerSelect.appendChild(option);
-    });
-
-    if (matchedFlowers.some(function (flower) { return flower.name === current; })) {
-      flowerSelect.value = current;
-    }
-
-    renderColorOptions();
-  }
-
-  function renderColorOptions() {
-    const selectedFlower = flowerDex.find(function (flower) {
-      return flower.name === flowerSelect.value;
-    });
-
-    colorSelect.innerHTML = "";
-
-    if (!selectedFlower) {
-      flowerInput.value = "";
-      return;
-    }
-
-    selectedFlower.colors.forEach(function (color) {
-      const option = document.createElement("option");
-      option.value = color;
-      option.textContent = color + "色";
-      colorSelect.appendChild(option);
-    });
-
-    updateSelectedFlowerInput();
-  }
-
-  function updateSelectedFlowerInput() {
-    const flowerName = flowerSelect.value;
-    const color = colorSelect.value;
-    flowerInput.value = flowerName && color ? color + "色" + flowerName : "";
-  }
-
-  keywordInput.addEventListener("input", renderFlowerOptions);
-  flowerSelect.addEventListener("change", renderColorOptions);
-  colorSelect.addEventListener("change", updateSelectedFlowerInput);
-
-  renderFlowerOptions();
-}
-
-function resetFlowerPicker() {
-  const keywordInput = document.getElementById("flowerKeywordInput");
-  if (keywordInput) keywordInput.value = "";
-  initFlowerPicker();
 }
 
 function showSection(sectionId, btn) {
@@ -316,7 +227,6 @@ function addWish() {
   });
 
   document.getElementById("flowerInput").value = "";
-  resetFlowerPicker();
   document.getElementById("messageInput").value = "";
   saveData();
   renderAll();
