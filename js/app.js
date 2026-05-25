@@ -328,6 +328,17 @@ function deleteWish(id) {
   addLocalWishHistory(cancelHistoryRecord);
 
   wishes.splice(wishIndex, 1);
+
+  // Firebase 願望同步刪除
+  if (deletedWish.firebaseId && window.firebaseDB && window.firebaseFns) {
+    const { deleteDoc, doc } = window.firebaseFns;
+
+    deleteDoc(doc(window.firebaseDB, "wishes", deletedWish.firebaseId))
+      .catch(function (error) {
+        console.error("Firebase 刪除同步失敗", error);
+      });
+  }
+
   saveData();
   renderAll();
 
