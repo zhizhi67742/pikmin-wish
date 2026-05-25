@@ -20,6 +20,7 @@ let done = [];
 let wishHistory = [];
 let selectedWishId = null;
 let selectedPendingId = null;
+let locallyDeletedWishKeys = new Set();
 
 function getCurrentNickname() {
   const savedNickname = localStorage.getItem("flowerWishNickname") || "";
@@ -313,6 +314,8 @@ function deleteWish(id) {
   if (!confirm("確定要刪除這個願望嗎？")) return;
 
   const deletedWish = wishes[wishIndex];
+  const deletedKey = String(deletedWish.firebaseId || deletedWish.id || id || "");
+  if (deletedKey) locallyDeletedWishKeys.add(deletedKey);
 
   const cancelHistoryRecord = makeWishHistoryRecord({
     id: deletedWish.id,
@@ -328,19 +331,17 @@ function deleteWish(id) {
   addLocalWishHistory(cancelHistoryRecord);
 
   wishes.splice(wishIndex, 1);
+  saveData();
+  renderAll();
 
-  // Firebase 願望同步刪除
   if (deletedWish.firebaseId && window.firebaseDB && window.firebaseFns) {
     const { deleteDoc, doc } = window.firebaseFns;
-
     deleteDoc(doc(window.firebaseDB, "wishes", deletedWish.firebaseId))
       .catch(function (error) {
         console.error("Firebase 刪除同步失敗", error);
+        alert("雲端刪除失敗，請檢查 Firebase 規則或網路連線。");
       });
   }
-
-  saveData();
-  renderAll();
 
   syncWishHistoryToCloud(cancelHistoryRecord);
 }
@@ -1555,6 +1556,10 @@ async function startFirebaseSync() {
         firebaseId: docItem.id,
         ...docItem.data()
       };
+
+      if (locallyDeletedWishKeys.has(String(data.firebaseId || data.id || ""))) {
+        return;
+      }
 
       if (data.status === "pending") {
         data.farmer = data.farmer || data.acceptedBy || "花農";
