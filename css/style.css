@@ -2665,3 +2665,30 @@ label textarea {
 .changelog-panel p {
   color: rgba(255,255,255,0.88) !important;
 }
+
+
+/* 歷史許願 */
+.wish-history-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:16px;
+}
+.wish-history-item{
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.history-sticky-head{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(31,43,34,0.98);
+  border-color: rgba(255,224,100,0.35);
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}

@@ -17,6 +17,7 @@ let wishes = [
 
 let pending = [];
 let done = [];
+let wishHistory = [];
 let selectedWishId = null;
 let selectedPendingId = null;
 
@@ -311,9 +312,23 @@ function deleteWish(id) {
 
   if (!confirm("確定要刪除這個願望嗎？")) return;
 
+  const deletedWish = wishes[wishIndex];
+
+  const cancelHistoryRecord = makeWishHistoryRecord({
+    flower: deletedWish.flower,
+    farmer: "—",
+    acceptedBy: "—",
+    nickname: deletedWish.nickname,
+    doneAt: Date.now()
+  }, "已取消");
+
+  addLocalWishHistory(cancelHistoryRecord);
+
   wishes.splice(wishIndex, 1);
   saveData();
   renderAll();
+
+  syncWishHistoryToCloud(cancelHistoryRecord);
 }
 
 function closeConfirmModal() {
@@ -443,6 +458,79 @@ function closeUploadConfirmModal() {
 }
 
 
+
+function makeWishHistoryRecord(item, statusText) {
+  const farmerName = item.farmer || item.acceptedBy || getCurrentNickname() || "花農";
+  const requesterName = item.nickname || item.requester || "許願者";
+  const finishedTime = formatHistoryTime(item.doneAt || Date.now());
+
+  return {
+    id: item.historyId || item.firebaseId || item.id || Date.now(),
+    sourceWishId: item.firebaseId || item.id || "",
+    flower: item.flower || "花朵",
+    farmer: farmerName,
+    requester: requesterName,
+    status: statusText || "已完成",
+    time: finishedTime,
+    createdAt: Date.now()
+  };
+}
+
+function formatHistoryTime(value) {
+  const date = value ? new Date(value) : new Date();
+  if (Number.isNaN(date.getTime())) return formatNow ? formatNow() : "";
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  return `${month}/${day} ${hour}:${minute}`;
+}
+
+function addLocalWishHistory(record) {
+  const key = String(record.sourceWishId || record.id || "");
+  const exists = wishHistory.some(function (item) {
+    return String(item.sourceWishId || item.id || "") === key && key;
+  });
+
+  if (!exists) {
+    wishHistory.unshift(record);
+  }
+}
+
+function renderWishHistory() {
+  const list = document.getElementById("wishHistoryList");
+  if (!list) return;
+
+  const header = '<div class="wish-history-item history-sticky-head">花朵｜花農 → 許願者｜是否完成｜時間</div>';
+  const records = Array.isArray(wishHistory) ? wishHistory.slice() : [];
+
+  records.sort(function (a, b) {
+    return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+  });
+
+  if (records.length === 0) {
+    list.innerHTML = header + '<div class="empty">目前還沒有歷史許願紀錄。</div>';
+    return;
+  }
+
+  list.innerHTML = header + records.map(function (item) {
+    return `<div class="wish-history-item">${escapeHtml(item.flower || "花朵")}｜${escapeHtml(item.farmer || "花農")} → ${escapeHtml(item.requester || "許願者")}｜${escapeHtml(item.status || "已完成")}｜${escapeHtml(item.time || "")}</div>`;
+  }).join("");
+}
+
+async function syncWishHistoryToCloud(record) {
+  if (!window.firebaseDB || !window.firebaseFns) return;
+
+  const { collection, addDoc } = window.firebaseFns;
+
+  try {
+    await addDoc(collection(window.firebaseDB, "wishHistory"), record);
+  } catch (error) {
+    console.error("Firebase 歷史許願同步失敗", error);
+  }
+}
+
+
 async function confirmDone() {
   const harvestInfo = document.getElementById("harvestInfoInput").value.trim();
   const rawLocation = document.getElementById("shareLocationInput").value;
@@ -474,6 +562,10 @@ async function confirmDone() {
   item.liked = false;
 
   done.unshift(item);
+
+  const historyRecord = makeWishHistoryRecord(item, "已完成");
+  addLocalWishHistory(historyRecord);
+  await syncWishHistoryToCloud(historyRecord);
 
   // 如果這筆願望來自 Firebase，要同步標記為完成。
   // 否則即時同步會再次把它從雲端讀回「待完成」，看起來就像網站回朔。
@@ -510,6 +602,7 @@ function renderAll() {
   renderWishes();
   renderPending();
   renderDone();
+  renderWishHistory();
   renderDex();
   bindDynamicButtons();
 }
@@ -1069,6 +1162,7 @@ function removeDemoWishesFromStorage() {
   safeSetLocalStorage("flowerWishWishes", JSON.stringify(wishes));
   safeSetLocalStorage("flowerWishPending", JSON.stringify(pending));
   safeSetLocalStorage("flowerWishDone", JSON.stringify(done));
+  safeSetLocalStorage("flowerWishHistory", JSON.stringify(wishHistory));
 }
 
 function removeExpiredWishes() {
@@ -1101,6 +1195,7 @@ function saveData() {
   safeSetLocalStorage("flowerWishWishes", JSON.stringify(wishes));
   safeSetLocalStorage("flowerWishPending", JSON.stringify(pending));
   safeSetLocalStorage("flowerWishDone", JSON.stringify(done));
+  safeSetLocalStorage("flowerWishHistory", JSON.stringify(wishHistory));
 }
 
 function loadData() {
@@ -1114,6 +1209,7 @@ function loadData() {
   const savedWishes = safeGetLocalStorage("flowerWishWishes");
   const savedPending = safeGetLocalStorage("flowerWishPending");
   const savedDone = safeGetLocalStorage("flowerWishDone");
+  const savedHistory = safeGetLocalStorage("flowerWishHistory");
   essenceLimit = Number(safeGetLocalStorage("flowerWishEssenceLimit") || 1200);
   petalLimit = Number(safeGetLocalStorage("flowerWishPetalLimit") || 1200);
   try {
@@ -1134,6 +1230,7 @@ function loadData() {
   if (savedWishes) wishes = JSON.parse(savedWishes);
   if (savedPending) pending = JSON.parse(savedPending);
   if (savedDone) done = JSON.parse(savedDone);
+  if (savedHistory) wishHistory = JSON.parse(savedHistory);
 
   removeDemoWishesFromStorage();
 
@@ -1377,6 +1474,7 @@ async function startFirebaseSync() {
   } = window.firebaseFns;
 
   const wishesRef = collection(db, "wishes");
+  const wishHistoryRef = collection(db, "wishHistory");
 
   // Firebase 準備好後，先讀取這個暱稱的雲端圖鑑。
   const savedDexName = getCurrentNickname();
@@ -1385,6 +1483,23 @@ async function startFirebaseSync() {
   }
 
   // 即時同步許願卡：許願區公開、待完成區公開、完成區公開。
+  onSnapshot(wishHistoryRef, (snapshot) => {
+    const localHistory = wishHistory.filter(function (item) {
+      return !item.firebaseId;
+    });
+
+    wishHistory = localHistory;
+
+    snapshot.forEach((docItem) => {
+      wishHistory.unshift({
+        firebaseId: docItem.id,
+        ...docItem.data()
+      });
+    });
+
+    renderWishHistory();
+  });
+
   onSnapshot(wishesRef, (snapshot) => {
     const localWishes = wishes.filter(function (item) {
       return !item.firebaseId;
@@ -1412,6 +1527,7 @@ async function startFirebaseSync() {
       } else if (data.status === "done") {
         data.farmer = data.farmer || data.acceptedBy || "花農";
         done.push(data);
+        addLocalWishHistory(makeWishHistoryRecord(data, "已完成"));
       } else {
         wishes.push(data);
       }
@@ -1420,6 +1536,8 @@ async function startFirebaseSync() {
     renderWishes();
     renderPending();
     renderDone();
+    renderWishHistory();
+    saveData();
     bindDynamicButtons();
   });
 
