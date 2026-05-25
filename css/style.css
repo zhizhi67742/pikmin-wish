@@ -2553,3 +2553,88 @@ label textarea {
     box-shadow:none !important;
   }
 }
+
+
+/* ===== REAL FINAL MOBILE FIX ===== */
+
+.footer-mobile-links{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  margin:8px auto;
+}
+
+.footer-mobile-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:#eef7e7;
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:12px;
+  min-height:30px;
+  box-sizing:border-box;
+}
+
+@media screen and (max-width:768px){
+
+  /* footer 修正 */
+  .footer-mobile-links{
+    width:100%;
+    max-width:260px;
+    gap:4px !important;
+  }
+
+  .footer-mobile-btn{
+    flex:1 1 0 !important;
+    width:auto !important;
+    min-width:0 !important;
+    padding:0 6px !important;
+    height:24px !important;
+    min-height:24px !important;
+    font-size:9px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+
+  /* 圖鑑進階按鈕 */
+  .dex-advanced-btn,
+  button.dex-advanced-btn{
+    width:52px !important;
+    min-width:52px !important;
+    max-width:52px !important;
+    height:28px !important;
+    min-height:28px !important;
+    padding:0 !important;
+    font-size:10px !important;
+  }
+
+  /* 圖鑑選項 */
+  .dex-filter-group{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:4px !important;
+  }
+
+  .dex-filter-btn{
+    width:100% !important;
+    height:22px !important;
+    min-height:22px !important;
+    padding:0 4px !important;
+    font-size:9px !important;
+    border-radius:8px !important;
+  }
+
+  .dex-filter-line{
+    grid-template-columns:48px 1fr !important;
+    gap:4px !important;
+  }
+
+  .dex-filter-label{
+    font-size:9px !important;
+  }
+}
