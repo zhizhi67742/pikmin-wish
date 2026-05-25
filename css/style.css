@@ -2638,3 +2638,27 @@ label textarea {
     font-size:9px !important;
   }
 }
+
+
+.history-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.history-item{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:14px;
+  line-height:1.6;
+  word-break:break-word;
+}
+
+@media (max-width: 768px){
+  .history-item{
+    font-size:13px;
+    padding:10px 12px;
+  }
+}
