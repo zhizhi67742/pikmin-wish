@@ -325,7 +325,7 @@ function deleteWish(id) {
     farmer: "—",
     acceptedBy: "—",
     nickname: deletedWish.nickname,
-    doneAt: Date.now()
+    cancelledAt: Date.now()
   }, "已取消");
 
   addLocalWishHistory(cancelHistoryRecord);
@@ -477,31 +477,36 @@ function closeUploadConfirmModal() {
 function getHistorySortTime(item) {
   if (!item) return 0;
 
+  // 歷史許願要依照畫面顯示的完成/取消時間排序，避免 Firebase 重新同步時 createdAt 被刷新，導致舊資料跑到上面。
   const candidates = [
-    item.historyCreatedAt,
-    item.createdAtSort,
+    item.time,
     item.doneAt,
     item.cancelledAt,
     item.canceledAt,
     item.finishedAt,
+    item.historyCreatedAt,
+    item.createdAtSort,
     item.createdTimestamp,
-    item.createdAt,
-    item.time
+    item.createdAt
   ];
 
   for (const value of candidates) {
     if (typeof value === "number" && Number.isFinite(value)) return value;
+
     if (typeof value === "string" && value.trim()) {
       const normalized = value.trim().replace(/-/g, "/");
       const parsed = new Date(normalized).getTime();
       if (!Number.isNaN(parsed)) return parsed;
 
-      // 舊資料可能只有 MM/DD HH:mm，補上今年，讓排序仍可用。
+      // 舊資料格式多半是「05/25 09:58」，補上今年後才能正確排序。
       const shortMatch = normalized.match(/^(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})$/);
       if (shortMatch) {
         const year = new Date().getFullYear();
-        const [, month, day, hour, minute] = shortMatch;
-        return new Date(year, Number(month) - 1, Number(day), Number(hour), Number(minute)).getTime();
+        const month = Number(shortMatch[1]);
+        const day = Number(shortMatch[2]);
+        const hour = Number(shortMatch[3]);
+        const minute = Number(shortMatch[4]);
+        return new Date(year, month - 1, day, hour, minute).getTime();
       }
     }
   }
@@ -512,9 +517,8 @@ function getHistorySortTime(item) {
 function makeWishHistoryRecord(item, statusText) {
   const farmerName = item.farmer || item.acceptedBy || getCurrentNickname() || "花農";
   const requesterName = item.nickname || item.requester || "許願者";
-  const historyTimeSource = item.doneAt || item.cancelledAt || item.canceledAt || item.finishedAt || item.createdTimestamp || item.historyCreatedAt || item.createdAt || Date.now();
+  const historyTimeSource = item.doneAt || item.cancelledAt || item.canceledAt || item.finishedAt || item.historyCreatedAt || item.createdAtSort || item.createdTimestamp || Date.now();
   const finishedTime = formatHistoryTime(historyTimeSource);
-  const sortTime = getHistorySortTime({ ...item, historyCreatedAt: historyTimeSource });
 
   return {
     id: item.historyId || item.firebaseId || item.id || Date.now(),
@@ -523,9 +527,9 @@ function makeWishHistoryRecord(item, statusText) {
     farmer: farmerName,
     requester: requesterName,
     status: statusText || item.status || "已完成",
-    time: finishedTime,
+    time: item.time || finishedTime,
     createdAt: item.createdAt || historyTimeSource,
-    historyCreatedAt: sortTime || Date.now()
+    historyCreatedAt: getHistorySortTime({ ...item, time: item.time || finishedTime, historyCreatedAt: historyTimeSource }) || Date.now()
   };
 }
 
