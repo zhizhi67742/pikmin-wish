@@ -391,14 +391,114 @@
 </div>
 
 
+
+<div id="termsModal" class="terms-modal-overlay" aria-hidden="true">
+  <div class="terms-modal-card" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+    <button type="button" class="terms-close-btn" onclick="closeTermsModal()" aria-label="關閉服務條款">×</button>
+    <h2 id="termsModalTitle">📜 PikminWish 服務條款</h2>
+    <p class="terms-updated">最後更新：2026 / 05 / 25</p>
+
+    <div class="terms-modal-scroll">
+      <section>
+        <h3>🌱 一、服務內容</h3>
+        <p>本網站為《Pikmin Bloom》玩家交流用途之非官方社群工具，提供許願卡發布、花農接單與分享、花朵圖鑑查詢與社群互動功能。本網站與 Nintendo、Niantic 或 Pikmin Bloom 官方無任何關聯。</p>
+      </section>
+
+      <section>
+        <h3>🤝 二、使用者規範</h3>
+        <ul>
+          <li>不得發布違法、騷擾、歧視、色情、暴力或惡意內容。</li>
+          <li>不得冒充他人、偽造資訊或惡意洗版。</li>
+          <li>不得利用網站功能進行商業詐騙或不當交易。</li>
+          <li>不得惡意干擾網站運作、攻擊系統或嘗試取得未授權資料。</li>
+          <li>請尊重其他玩家與花農，避免造成社群糾紛。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>💐 三、接單與分享聲明</h3>
+        <ul>
+          <li>花農提供分享屬自願性質，並非義務。</li>
+          <li>許願者與花農應自行協調分享內容與時間。</li>
+          <li>本網站不保證一定能成功接單、完成分享或取得指定花朵。</li>
+          <li>玩家間互動產生之糾紛，原則上由雙方自行處理。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>🔒 四、資料與隱私</h3>
+        <ul>
+          <li>本網站可能會儲存您輸入之暱稱、願望內容與操作資料，以提供正常功能。</li>
+          <li>本網站不會主動販售或公開您的個人資料。</li>
+          <li>請勿自行公開敏感資訊，如住址、密碼、身分證資料等。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>⚠️ 五、免責聲明</h3>
+        <p>本網站依「現況」提供服務，不保證網站永不中斷、資料完全正確或功能永遠無錯誤。因系統維護或故障、第三方服務異常、使用者操作失誤或玩家間私人糾紛造成之損失，本網站不負責。</p>
+      </section>
+
+      <section>
+        <h3>🛠️ 六、內容管理權</h3>
+        <p>管理者有權刪除不適當內容、調整網站功能、修改網站規則、暫停或終止部分服務，無需事前個別通知。</p>
+      </section>
+
+      <section>
+        <h3>📌 七、條款修改</h3>
+        <p>本網站保留隨時修改本條款之權利。修改後內容將直接公布於網站，若您於修改後繼續使用本網站，即視為同意最新版本條款。</p>
+      </section>
+
+      <section>
+        <h3>💌 八、聯絡方式</h3>
+        <p>若有問題、建議或檢舉事項，請透過社群管理員聯繫。</p>
+      </section>
+    </div>
+  </div>
+</div>
+
 <div class="footer" style="text-align:center;">
   <div style="margin-bottom:8px; font-size:13px; opacity:0.85;">
     此網頁僅供「皮克敏飛人交流群💐Pikmin Bloom」&「ᴘɪᴋᴍɪɴ ʙʟᴏᴏᴍ皮皮之家🌱」使用
+  </div>
+
+  <div class="footer-link-row">
+    <button type="button" class="terms-footer-btn" onclick="openTermsModal()">📜 服務條款</button>
+    <a class="terms-footer-btn footer-social-btn" href="https://discord.gg/anKDQyM76Y" target="_blank" rel="noopener noreferrer">💬 DC</a>
+    <a class="terms-footer-btn footer-social-btn" href="https://line.me/ti/g2/J5Fc9xmn_yQcE-ZKfAfGxPe4VjUrdTslS-I9kQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer">💚 LINE</a>
   </div>
 
   <div>
     © 2026 梔梔 v1.1 ｜ 許願池及花朵圖鑑
   </div>
 </div>
+
+<script>
+  function openTermsModal(){
+    const modal = document.getElementById("termsModal");
+    if(!modal) return;
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("terms-modal-open");
+  }
+
+  function closeTermsModal(){
+    const modal = document.getElementById("termsModal");
+    if(!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("terms-modal-open");
+  }
+
+  document.addEventListener("click", function(e){
+    const modal = document.getElementById("termsModal");
+    if(modal && e.target === modal) closeTermsModal();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") closeTermsModal();
+  });
+</script>
+
 </body>
 </html>
