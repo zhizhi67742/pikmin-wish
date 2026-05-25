@@ -315,6 +315,9 @@ function deleteWish(id) {
   const deletedWish = wishes[wishIndex];
 
   const cancelHistoryRecord = makeWishHistoryRecord({
+    id: deletedWish.id,
+    firebaseId: deletedWish.firebaseId,
+    sourceWishId: deletedWish.firebaseId || deletedWish.id || "",
     flower: deletedWish.flower,
     farmer: "—",
     acceptedBy: "—",
@@ -466,7 +469,7 @@ function makeWishHistoryRecord(item, statusText) {
 
   return {
     id: item.historyId || item.firebaseId || item.id || Date.now(),
-    sourceWishId: item.firebaseId || item.id || "",
+    sourceWishId: item.sourceWishId || item.firebaseId || item.id || "",
     flower: item.flower || "花朵",
     farmer: farmerName,
     requester: requesterName,
@@ -486,10 +489,25 @@ function formatHistoryTime(value) {
   return `${month}/${day} ${hour}:${minute}`;
 }
 
+function getWishHistoryUniqueKey(item) {
+  const sourceKey = String(item.sourceWishId || item.id || item.firebaseId || "");
+  if (sourceKey) {
+    return sourceKey + "|" + String(item.status || "");
+  }
+
+  return [
+    item.flower || "",
+    item.farmer || "",
+    item.requester || "",
+    item.status || "",
+    item.time || ""
+  ].join("|");
+}
+
 function addLocalWishHistory(record) {
-  const key = String(record.sourceWishId || record.id || "");
+  const key = getWishHistoryUniqueKey(record);
   const exists = wishHistory.some(function (item) {
-    return String(item.sourceWishId || item.id || "") === key && key;
+    return getWishHistoryUniqueKey(item) === key;
   });
 
   if (!exists) {
@@ -502,7 +520,13 @@ function renderWishHistory() {
   if (!list) return;
 
   const header = '<div class="wish-history-item history-sticky-head">花朵｜花農 → 許願者｜是否完成｜時間</div>';
-  const records = Array.isArray(wishHistory) ? wishHistory.slice() : [];
+  const seenHistoryKeys = new Set();
+  const records = (Array.isArray(wishHistory) ? wishHistory.slice() : []).filter(function (item) {
+    const key = getWishHistoryUniqueKey(item);
+    if (seenHistoryKeys.has(key)) return false;
+    seenHistoryKeys.add(key);
+    return true;
+  });
 
   records.sort(function (a, b) {
     return Number(b.createdAt || 0) - Number(a.createdAt || 0);
@@ -1491,7 +1515,7 @@ async function startFirebaseSync() {
     wishHistory = localHistory;
 
     snapshot.forEach((docItem) => {
-      wishHistory.unshift({
+      addLocalWishHistory({
         firebaseId: docItem.id,
         ...docItem.data()
       });
