@@ -2692,3 +2692,22 @@ label textarea {
   font-weight: 700;
   backdrop-filter: blur(8px);
 }
+
+
+/* 手機版導覽列四格並排 */
+@media (max-width: 600px) {
+  .main-nav {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .main-nav .nav-btn {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 4px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
