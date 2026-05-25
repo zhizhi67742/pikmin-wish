@@ -474,10 +474,47 @@ function closeUploadConfirmModal() {
 
 
 
+function getHistorySortTime(item) {
+  if (!item) return 0;
+
+  const candidates = [
+    item.historyCreatedAt,
+    item.createdAtSort,
+    item.doneAt,
+    item.cancelledAt,
+    item.canceledAt,
+    item.finishedAt,
+    item.createdTimestamp,
+    item.createdAt,
+    item.time
+  ];
+
+  for (const value of candidates) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string" && value.trim()) {
+      const normalized = value.trim().replace(/-/g, "/");
+      const parsed = new Date(normalized).getTime();
+      if (!Number.isNaN(parsed)) return parsed;
+
+      // 舊資料可能只有 MM/DD HH:mm，補上今年，讓排序仍可用。
+      const shortMatch = normalized.match(/^(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})$/);
+      if (shortMatch) {
+        const year = new Date().getFullYear();
+        const [, month, day, hour, minute] = shortMatch;
+        return new Date(year, Number(month) - 1, Number(day), Number(hour), Number(minute)).getTime();
+      }
+    }
+  }
+
+  return 0;
+}
+
 function makeWishHistoryRecord(item, statusText) {
   const farmerName = item.farmer || item.acceptedBy || getCurrentNickname() || "花農";
   const requesterName = item.nickname || item.requester || "許願者";
-  const finishedTime = formatHistoryTime(item.doneAt || Date.now());
+  const historyTimeSource = item.doneAt || item.cancelledAt || item.canceledAt || item.finishedAt || item.createdTimestamp || item.historyCreatedAt || item.createdAt || Date.now();
+  const finishedTime = formatHistoryTime(historyTimeSource);
+  const sortTime = getHistorySortTime({ ...item, historyCreatedAt: historyTimeSource });
 
   return {
     id: item.historyId || item.firebaseId || item.id || Date.now(),
@@ -485,9 +522,10 @@ function makeWishHistoryRecord(item, statusText) {
     flower: item.flower || "花朵",
     farmer: farmerName,
     requester: requesterName,
-    status: statusText || "已完成",
+    status: statusText || item.status || "已完成",
     time: finishedTime,
-    createdAt: Date.now()
+    createdAt: item.createdAt || historyTimeSource,
+    historyCreatedAt: sortTime || Date.now()
   };
 }
 
@@ -541,9 +579,7 @@ function renderWishHistory() {
   });
 
   records.sort(function (a, b) {
-    const timeA = new Date(a.createdAt || 0).getTime() || 0;
-    const timeB = new Date(b.createdAt || 0).getTime() || 0;
-    return timeB - timeA;
+    return getHistorySortTime(b) - getHistorySortTime(a);
   });
 
   if (records.length === 0) {
