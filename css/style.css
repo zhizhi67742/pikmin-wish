@@ -1061,6 +1061,29 @@ label textarea {
 .confirm-preview strong {
   color: #ffd966;
 }
+
+.flower-picker {
+  margin-top: 9px;
+  display: grid;
+  gap: 10px;
+}
+
+.flower-picker-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(92px, 0.6fr);
+  gap: 10px;
+}
+
+.flower-picker input,
+.flower-picker select {
+  margin-top: 0;
+}
+
+@media (max-width: 520px) {
+  .flower-picker-row {
+    grid-template-columns: 1fr;
+  }
+}
 .flower-tip {
   margin-top: 8px;
   margin-bottom: 0;
