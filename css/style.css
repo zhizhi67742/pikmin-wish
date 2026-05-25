@@ -2640,25 +2640,28 @@ label textarea {
 }
 
 
-.history-list{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+/* 歷史許願 */
+.history-sticky-head{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(31, 43, 34, 0.98);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+  backdrop-filter: blur(8px);
 }
 
-.history-item{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  padding:12px 14px;
-  font-size:14px;
-  line-height:1.6;
-  word-break:break-word;
-}
 
-@media (max-width: 768px){
-  .history-item{
-    font-size:13px;
-    padding:10px 12px;
-  }
+/* 更新日誌說明文字修正 */
+.changelog-subtitle,
+.update-log-subtitle,
+.changelog-desc,
+.update-desc,
+.changelog-header p,
+.changelog-panel p {
+  color: rgba(255,255,255,0.88) !important;
 }
