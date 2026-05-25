@@ -541,7 +541,9 @@ function renderWishHistory() {
   });
 
   records.sort(function (a, b) {
-    return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+    const timeA = new Date(a.createdAt || 0).getTime() || 0;
+    const timeB = new Date(b.createdAt || 0).getTime() || 0;
+    return timeB - timeA;
   });
 
   if (records.length === 0) {
