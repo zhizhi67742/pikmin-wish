@@ -1455,7 +1455,7 @@ label textarea {
 }
 
 
-/* ===== PikminWish v1.1 final fixes ===== */
+/* ===== PikminWish v1.0.1 final fixes ===== */
 .footer {
   position: relative;
   z-index: 1;
@@ -1590,7 +1590,7 @@ label textarea {
 }
 
 
-/* ===== PikminWish v1.1 mobile dex limit layout hotfix ===== */
+/* ===== PikminWish v1.0.1 mobile dex limit layout hotfix ===== */
 .dex-jump-tip {
   display: block !important;
   margin: 10px auto 0 !important;
