@@ -3626,3 +3626,70 @@ h1 {
   opacity:0.4;
   cursor:not-allowed;
 }
+
+/* 暱稱平台標籤：不寫入暱稱，只作為畫面顯示 */
+.name-platform-tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:0.75em;
+  font-weight:800;
+  line-height:1.2;
+  color:#243b25;
+  background:rgba(220, 244, 196, 0.95);
+  border:1px solid rgba(255,255,255,0.35);
+  vertical-align:middle;
+  white-space:nowrap;
+}
+
+/* ===== FINAL FIX: LINE/DC 小標籤穩定顯示，不影響暱稱資料 ===== */
+.name-platform-tag{
+  display:inline-block !important;
+  position:static !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  float:none !important;
+  clear:none !important;
+  width:auto !important;
+  min-width:auto !important;
+  max-width:max-content !important;
+  height:auto !important;
+  min-height:0 !important;
+  box-sizing:border-box !important;
+  margin:0 0 0 6px !important;
+  padding:2px 7px !important;
+  border-radius:999px !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  line-height:1.15 !important;
+  letter-spacing:0.02em !important;
+  vertical-align:baseline !important;
+  white-space:nowrap !important;
+  color:#20351f !important;
+  background:#dff4c8 !important;
+  border:1px solid rgba(255,255,255,0.45) !important;
+  box-shadow:none !important;
+}
+
+.wish-card p .name-platform-tag,
+.history-card p .name-platform-tag,
+.completed-card p .name-platform-tag,
+.order-card p .name-platform-tag{
+  flex:0 0 auto !important;
+}
+
+@media (max-width: 640px){
+  .name-platform-tag{
+    margin-left:4px !important;
+    padding:1px 6px !important;
+    font-size:10px !important;
+    line-height:1.1 !important;
+    vertical-align:1px !important;
+  }
+}

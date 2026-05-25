@@ -23,27 +23,57 @@ let selectedPendingId = null;
 let locallyDeletedWishKeys = new Set();
 
 function getCurrentNickname() {
-  const savedNickname = localStorage.getItem("flowerWishNickname") || "";
+  const savedNickname = normalizeNicknameOnly(localStorage.getItem("flowerWishNickname") || "");
   if (savedNickname.trim()) {
     nickname = savedNickname.trim();
+    localStorage.setItem("flowerWishNickname", nickname);
     return nickname;
   }
 
   const oldNicknameInput = document.getElementById("nicknameInput");
   if (oldNicknameInput && oldNicknameInput.value.trim()) {
-    nickname = oldNicknameInput.value.trim();
+    nickname = normalizeNicknameOnly(oldNicknameInput.value);
     localStorage.setItem("flowerWishNickname", nickname);
     return nickname;
   }
 
   const gateNicknameInput = document.getElementById("gateNicknameInput");
   if (gateNicknameInput && gateNicknameInput.value.trim()) {
-    nickname = gateNicknameInput.value.trim();
+    nickname = normalizeNicknameOnly(gateNicknameInput.value);
     localStorage.setItem("flowerWishNickname", nickname);
     return nickname;
   }
 
   return "";
+}
+
+
+function normalizeNicknameOnly(value) {
+  return String(value || "").trim().replace(/_(LINE|DC)$/i, "");
+}
+
+function normalizePlatform(value) {
+  const platform = String(value || "LINE").trim().toUpperCase();
+  return platform === "DC" ? "DC" : "LINE";
+}
+
+function getCurrentPlatform() {
+  return normalizePlatform(localStorage.getItem("flowerWishPlatform") || "LINE");
+}
+
+function setNicknameAndPlatform(name, platform) {
+  const cleanName = normalizeNicknameOnly(name);
+  const cleanPlatform = normalizePlatform(platform);
+  nickname = cleanName;
+  localStorage.setItem("flowerWishNickname", cleanName);
+  localStorage.setItem("flowerWishPlatform", cleanPlatform);
+  return { name: cleanName, platform: cleanPlatform };
+}
+
+function displayNameWithTagHtml(name, platform) {
+  const cleanName = normalizeNicknameOnly(name) || "未設定";
+  const cleanPlatform = normalizePlatform(platform);
+  return `${escapeHtml(cleanName)} <span class="name-platform-tag">${escapeHtml(cleanPlatform)}</span>`;
 }
 
 function getWishKey(item) {
@@ -370,7 +400,7 @@ function saveNickname() {
   const input = document.getElementById("nicknameInput");
   if (!input) return;
 
-  nickname = input ? input.value.trim() : "";
+  nickname = input ? normalizeNicknameOnly(input.value) : "";
 
   if (!nickname) {
     alert("請先輸入 LINE 社群暱稱。");
@@ -729,6 +759,8 @@ function confirmTakeOrder() {
   const wish = wishes.splice(wishIndex, 1)[0];
   wish.farmer = nickname;
   wish.acceptedBy = nickname;
+  wish.farmerPlatform = getCurrentPlatform();
+  wish.acceptedByPlatform = getCurrentPlatform();
   wish.acceptedAt = formatNow();
   wish.status = "pending";
   pending.unshift(wish);
@@ -738,6 +770,8 @@ function confirmTakeOrder() {
     updateDoc(doc(window.firebaseDB, "wishes", wish.firebaseId), {
       acceptedBy: nickname,
       farmer: nickname,
+      acceptedByPlatform: getCurrentPlatform(),
+      farmerPlatform: getCurrentPlatform(),
       acceptedAt: wish.acceptedAt,
       status: "pending"
     }).catch(function (error) {
@@ -1180,7 +1214,7 @@ function renderWishes() {
     list.innerHTML += `
       <article class="${cardClass}">
         <h3>🌸 ${escapeHtml(wish.flower)}</h3>
-        <p>👤 暱稱：${escapeHtml(wish.nickname)}</p>
+        <p>👤 暱稱：${displayNameWithTagHtml(wish.nickname, wish.requesterPlatform || wish.platform)}</p>
         <p>🕒 發願時間：${escapeHtml(wish.createdAt)}</p>
         <p>🌙 可收花時間：${escapeHtml(wish.timeRange)}</p>
         <p>💬 ${escapeHtml(wish.message)}</p>
@@ -1210,10 +1244,10 @@ function renderPending() {
     list.innerHTML += `
       <article class="card">
         <h3>🌱 ${escapeHtml(item.flower)}</h3>
-        <p>👤 發願者：${escapeHtml(item.nickname || "匿名許願者")}</p>
+        <p>👤 發願者：${displayNameWithTagHtml(item.nickname || "匿名許願者", item.requesterPlatform || item.platform)}</p>
         <p>🕒 發願時間：${escapeHtml(item.createdAt || "未記錄")}</p>
         <p>🌙 可收花時間：${escapeHtml(item.timeRange || "未設定")}</p>
-        <p>🌱 接單花農：${escapeHtml(item.farmer || item.acceptedBy || "花農")}</p>
+        <p>🌱 接單花農：${displayNameWithTagHtml(item.farmer || item.acceptedBy || "花農", item.farmerPlatform || item.acceptedByPlatform)}</p>
         <p class="hint">狀態：花農已接單，待完成分享。</p>
         ${actionButton}
       </article>
@@ -1244,8 +1278,8 @@ function renderDone() {
     list.innerHTML += `
       <article class="card">
         <h3>✨ ${escapeHtml(item.flower)}</h3>
-        <p>👤 發願者：${escapeHtml(item.nickname)}</p>
-        <p>🌱 接單花農：${escapeHtml(item.farmer)}</p>
+        <p>👤 發願者：${displayNameWithTagHtml(item.nickname, item.requesterPlatform || item.platform)}</p>
+        <p>🌱 接單花農：${displayNameWithTagHtml(item.farmer, item.farmerPlatform || item.acceptedByPlatform)}</p>
         <p>🌼 採收資訊：${escapeHtml(item.harvestInfo)}</p>
         <p>📍 分享地點／座標：</p>
         <pre class="coord-list" id="coord-${item.id}">${escapeHtml(item.location).replace(/\\n/g, "\n")}</pre>
@@ -2118,6 +2152,7 @@ async function startFirebaseSync() {
     const newWish = {
       flower,
       nickname,
+      requesterPlatform: getCurrentPlatform(),
       createdAt: now.toLocaleString(),
       timeRange: `${startHour}:${startMinute} - ${endHour}:${endMinute}`,
       message,
@@ -2149,6 +2184,8 @@ async function startFirebaseSync() {
     await updateDoc(doc(db, "wishes", firebaseId), {
       acceptedBy: nickname,
       farmer: nickname,
+      acceptedByPlatform: getCurrentPlatform(),
+      farmerPlatform: getCurrentPlatform(),
       acceptedAt: formatNow(),
       status: "pending"
     });
@@ -2171,9 +2208,8 @@ function enterWebsite() {
     return;
   }
 
-  const cleanNickname = rawNickname.replace(/_(LINE|DC)$/i, "");
-  nickname = `${cleanNickname}_${platform}`;
-  localStorage.setItem("flowerWishNickname", nickname);
+  const saved = setNicknameAndPlatform(rawNickname, platform);
+  nickname = saved.name;
 
   const nicknameInput = document.getElementById("nicknameInput");
   if (nicknameInput) {
@@ -2237,7 +2273,7 @@ function updateNicknameDisplay() {
   if (!nicknameText) return;
 
   const currentName = getCurrentNickname();
-  nicknameText.textContent = currentName || "未設定";
+  nicknameText.innerHTML = displayNameWithTagHtml(currentName || "未設定", getCurrentPlatform());
 }
 
 function openNicknameModal() {
@@ -2517,7 +2553,7 @@ function splitSavedNicknameForGate(savedNickname) {
   const match = text.match(/_(LINE|DC)$/i);
   return {
     name: match ? text.replace(/_(LINE|DC)$/i, "") : text,
-    platform: match ? match[1].toUpperCase() : "LINE"
+    platform: match ? match[1].toUpperCase() : getCurrentPlatform()
   };
 }
 
@@ -2551,8 +2587,8 @@ window.openRuleModal = showNicknameGateForEdit;
 function updateCurrentNicknameBar() {
   const nicknameText = document.getElementById("currentNicknameText");
   if (!nicknameText) return;
-  const currentName = localStorage.getItem("flowerWishNickname") || nickname || "";
-  nicknameText.textContent = currentName || "未設定";
+  const currentName = getCurrentNickname() || nickname || "";
+  nicknameText.innerHTML = displayNameWithTagHtml(currentName || "未設定", getCurrentPlatform());
 }
 
 window.updateCurrentNicknameBar = updateCurrentNicknameBar;
