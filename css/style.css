@@ -1609,3 +1609,124 @@ label textarea {
 
 .dex-jump-tip{white-space:nowrap;font-size:14px;}
 @media (max-width:480px){.dex-jump-tip{font-size:12px;letter-spacing:-0.2px;}}
+
+
+/* 更新日誌 */
+.changelog-panel{
+  margin-top:40px;
+  overflow:hidden;
+}
+
+.changelog-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.changelog-badge{
+  background:linear-gradient(135deg,#ffe27a,#ffd84d);
+  color:#2d321f;
+  font-weight:700;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  letter-spacing:1px;
+  box-shadow:0 4px 15px rgba(255,217,102,0.25);
+}
+
+.changelog-timeline{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.changelog-timeline::before{
+  content:"";
+  position:absolute;
+  left:11px;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:rgba(255,255,255,0.12);
+}
+
+.changelog-item{
+  position:relative;
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+}
+
+.changelog-dot{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#ffd966;
+  border:4px solid rgba(255,255,255,0.08);
+  box-shadow:0 0 18px rgba(255,217,102,0.4);
+  z-index:2;
+  flex-shrink:0;
+}
+
+.changelog-card{
+  flex:1;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;
+  padding:18px 20px;
+  backdrop-filter:blur(12px);
+}
+
+.changelog-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+
+.changelog-top strong{
+  font-size:18px;
+  color:#ffe27a;
+}
+
+.changelog-top span{
+  font-size:13px;
+  opacity:0.7;
+}
+
+.changelog-card ul{
+  margin:0;
+  padding-left:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.changelog-card li{
+  line-height:1.5;
+}
+
+.latest .changelog-card{
+  border-color:rgba(255,217,102,0.25);
+  box-shadow:0 10px 30px rgba(0,0,0,0.18);
+}
+
+@media (max-width:768px){
+  .changelog-card{
+    padding:16px;
+    border-radius:20px;
+  }
+
+  .changelog-top strong{
+    font-size:16px;
+  }
+
+  .changelog-card li{
+    font-size:14px;
+  }
+}

@@ -25,6 +25,7 @@
     <nav class="main-nav">
       <button class="nav-btn active" onclick="showSection('wish', this)">🌱 許願池</button>
       <button class="nav-btn" onclick="showSection('dex', this)">🌸 花朵圖鑑</button>
+      <button class="nav-btn" onclick="showSection('changelog', this)">📜 更新日誌</button>
     </nav>
 
     <div class="event-banner">
@@ -130,6 +131,68 @@
 
       <div id="flowerDexList" class="dex-list"></div>
     </section>
+  
+    <section id="changelog" class="page-section">
+      <section class="panel changelog-panel">
+        <div class="changelog-title-row">
+          <h2>📜 更新日誌</h2>
+          <span class="changelog-badge">LATEST</span>
+        </div>
+
+        <div class="changelog-timeline">
+
+          <div class="changelog-item latest">
+            <div class="changelog-dot"></div>
+            <div class="changelog-card">
+              <div class="changelog-top">
+                <strong>✨ PikminWish v1.0.1</strong>
+                <span>2026 / 05 / 25</span>
+              </div>
+
+              <h4>🛠 系統修正</h4>
+              <ul>
+                <li>修正花朵圖鑑於手機板時，精華／花瓣輸入造成選單自動關閉的問題。</li>
+                <li>修正手機板圖鑑介面重疊與版面跑位問題。</li>
+                <li>優化輸入欄位尺寸，避免內容超出顯示範圍。</li>
+              </ul>
+
+              <h4>🌱 功能優化</h4>
+              <ul>
+                <li>新增「連續輸入不中斷」功能，更新圖鑑更加流暢。</li>
+                <li>新增「更新日誌」獨立頁面。</li>
+                <li>新增快速提示：點擊花朵旁邊的「缺」即可快速跳轉許願。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="changelog-item">
+            <div class="changelog-dot"></div>
+            <div class="changelog-card">
+              <div class="changelog-top">
+                <strong>🌼 PikminWish v1.0.0</strong>
+                <span>2026 / 05 / 24</span>
+              </div>
+
+              <h4>🌱 初版功能</h4>
+              <ul>
+                <li>PikminWish 花農許願池正式上線。</li>
+                <li>新增願望卡分享功能。</li>
+                <li>支援接單與完成分享系統。</li>
+                <li>新增花朵圖鑑功能。</li>
+              </ul>
+
+              <h4>💌 社群互動</h4>
+              <ul>
+                <li>建立花農與採花者互助分享機制。</li>
+                <li>支援快速查看花種需求與收藏狀態。</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </section>
+
   </main>
 
   <div id="confirmModal" class="modal">
