@@ -3973,7 +3973,7 @@ h1 {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 660px !important;
-  margin-left: 0 !important;
+  margin-left: auto !important;
   margin-right: auto !important;
 }
 
@@ -3982,7 +3982,7 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 12px !important;
   align-items: stretch !important;
-  justify-content: start !important;
+  justify-content: center !important;
   position: static !important;
   float: none !important;
   clear: both !important;
