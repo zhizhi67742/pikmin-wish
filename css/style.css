@@ -166,6 +166,35 @@ button {
   transition: 0.2s;
 }
 
+.wish-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.farmer-share-btn {
+  background: rgba(124, 171, 129, 0.38);
+  color: #fffbe7;
+  font-weight: 900;
+  border-radius: 18px;
+  padding: 13px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+@media (max-width: 640px) {
+  .wish-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wish-action-row button {
+    width: 100%;
+  }
+}
+
 button:hover {
   transform: translateY(-1px) scale(1.01);
 }
@@ -3691,5 +3720,248 @@ h1 {
     font-size:10px !important;
     line-height:1.1 !important;
     vertical-align:1px !important;
+  }
+}
+
+
+/* Farmer direct upload button alignment fix */
+.panel > label:has(#messageInput),
+.panel > .wish-action-row {
+  width: min(100%, 660px);
+  margin-left: 26px;
+}
+
+.wish-action-row {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.wish-action-row .primary-btn,
+.wish-action-row .farmer-share-btn {
+  position: static !important;
+  float: none !important;
+  transform: none;
+  white-space: nowrap;
+  min-height: 48px;
+}
+
+.wish-action-row .farmer-share-btn {
+  background: rgba(124, 171, 129, 0.38);
+  color: #fffbe7;
+}
+
+.wish-action-row .primary-btn:hover,
+.wish-action-row .farmer-share-btn:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 760px) {
+  .panel > label:has(#messageInput),
+  .panel > .wish-action-row {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .wish-action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .wish-action-row .primary-btn,
+  .wish-action-row .farmer-share-btn {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+
+/* === FINAL FIX: keep wish submit buttons anchored under message box on GitHub Pages === */
+.panel .message-field,
+.panel .wish-actions-fixed {
+  box-sizing: border-box !important;
+  width: min(100%, 660px) !important;
+  max-width: 660px !important;
+  margin-left: 26px !important;
+  margin-right: auto !important;
+}
+
+.panel .wish-actions-fixed {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+  position: relative !important;
+  float: none !important;
+  clear: both !important;
+  padding: 0 !important;
+  margin-top: 14px !important;
+  transform: none !important;
+}
+
+.panel .wish-actions-fixed > button,
+.panel .wish-actions-fixed > .primary-btn,
+.panel .wish-actions-fixed > .farmer-share-btn {
+  position: relative !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  float: none !important;
+  transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  z-index: 1 !important;
+}
+
+.panel .wish-actions-fixed > .farmer-share-btn {
+  background: rgba(124, 171, 129, 0.42) !important;
+  color: #fffbe7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.panel .wish-actions-fixed > button:hover {
+  transform: translateY(-1px) !important;
+}
+
+@media (max-width: 760px) {
+  .panel .message-field,
+  .panel .wish-actions-fixed {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .panel .wish-actions-fixed {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .panel .wish-actions-fixed > button,
+  .panel .wish-actions-fixed > .primary-btn,
+  .panel .wish-actions-fixed > .farmer-share-btn {
+    width: 100% !important;
+    white-space: normal !important;
+  }
+}
+
+/* === FINAL FIX: done modal mobile bottom buttons stay aligned and inside modal === */
+#doneModal .modal-box-large {
+  box-sizing: border-box !important;
+}
+
+#doneModal .modal-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin-top: 16px !important;
+}
+
+#doneModal .modal-actions .cancel-btn,
+#doneModal .modal-actions .confirm-btn {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 760px) {
+  #doneModal {
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+    padding: 12px 10px !important;
+  }
+
+  #doneModal .modal-box-large {
+    width: min(94vw, 430px) !important;
+    max-width: 94vw !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+    padding: 22px 18px 18px !important;
+    border-radius: 24px !important;
+  }
+
+  #doneModal .modal-box h2,
+  #doneModalTitle {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+    margin-bottom: 10px !important;
+  }
+
+  #doneModalDesc {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    margin: 0 0 12px !important;
+  }
+
+  #doneModal #harvestInfoInput {
+    height: 46px !important;
+    margin-top: 8px !important;
+  }
+
+  #doneModal .harvest-quick-tags {
+    margin: 10px 0 12px !important;
+    gap: 8px !important;
+  }
+
+  #doneModal .coord-input {
+    min-height: 132px !important;
+    max-height: 180px !important;
+    margin-top: 8px !important;
+  }
+
+  #doneModal .clean-coord-btn {
+    margin-top: 12px !important;
+    min-height: 50px !important;
+  }
+
+  #doneModal .modal-actions {
+    flex-direction: row !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+  }
+
+  #doneModal .modal-actions button {
+    min-height: 50px !important;
+    padding: 12px 10px !important;
+    font-size: 16px !important;
+    border-radius: 17px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #doneModal .modal-box-large {
+    padding: 20px 14px 16px !important;
+  }
+
+  #doneModal .modal-actions {
+    gap: 8px !important;
+  }
+
+  #doneModal .modal-actions button {
+    font-size: 15px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
   }
 }

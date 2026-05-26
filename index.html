@@ -103,6 +103,30 @@
   }
 }
 
+
+@media (max-width: 768px){
+  .harvest-quick-tags{
+    display:flex !important;
+    flex-wrap:wrap !important;
+    flex-direction:row !important;
+    gap:8px !important;
+    align-items:flex-start !important;
+  }
+
+  .harvest-tag-btn,
+  .harvest-tag-clear{
+    width:auto !important;
+    flex:0 0 auto !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    white-space:nowrap !important;
+    padding:6px 12px !important;
+    font-size:12px !important;
+    border-radius:999px !important;
+  }
+}
+
 </style>
 
 <style>
@@ -390,12 +414,15 @@ h1 {
           </div>
         </div>
 
-        <label>
+        <label class="message-field">
           留言（選填）
           <textarea id="messageInput" rows="4" placeholder="例如：新手求幫忙、謝謝花農..."></textarea>
         </label>
 
-        <button class="primary-btn" onclick="addWish()">🌱 新增願望卡</button>
+        <div class="wish-action-row wish-actions-fixed">
+          <button class="primary-btn" onclick="addWish()">🌱 新增願望卡</button>
+          <button class="farmer-share-btn" type="button" onclick="openFarmerShareModal()">📍 花農直接上傳座標</button>
+        </div>
       </section>
 
       <section class="section-title collapse-title">
@@ -522,13 +549,39 @@ h1 {
         </div>
 
         <div class="changelog-grid">
+
+<article class="update-card latest">
+  <div class="update-card-head">
+    <div>
+      <div class="update-version">🌸 PikminWish v1.2.1</div>
+      <div class="update-date">2026 / 05 / 26</div>
+    </div>
+    <span class="latest-tag">最新</span>
+  </div>
+
+  <div class="update-section">
+    <h3>🌱 功能新增</h3>
+    <ul>
+      <li>新增花農直接上傳座標功能</li>
+      <li>花種顏色選擇新增「混色」及「隨意色」</li>
+    </ul>
+  </div>
+
+  <div class="update-section">
+    <h3>🛠️ 系統修正</h3>
+    <ul>
+      <li>修正取消原因視窗顯示問題</li>
+    </ul>
+  </div>
+</article>
+
 <article class="update-card latest">
             <div class="update-card-head">
               <div>
                 <div class="update-version">🌸 PikminWish v1.2.0</div>
                 <div class="update-date">2026 / 05 / 26</div>
               </div>
-              <span class="latest-tag">最新</span>
+              
             </div>
 
             <div class="update-section">
@@ -651,8 +704,8 @@ h1 {
 
   <div id="doneModal" class="modal">
     <div class="modal-box modal-box-large">
-      <h2>完成分享</h2>
-      <p>請輸入採收資訊與分享地點。分享地點可以直接貼上多行座標。</p>
+      <h2 id="doneModalTitle">完成分享</h2>
+      <p id="doneModalDesc">請輸入採收資訊與分享地點。分享地點可以直接貼上多行座標。</p>
 
       <input
         id="harvestInfoInput"
@@ -892,7 +945,7 @@ h1 {
 </div>
 
 <div>
-    © 2026 梔梔 v1.1.0 ｜ 許願池及花朵圖鑑
+    © 2026 梔梔 v1.2.1 ｜ 許願池及花朵圖鑑
   </div>
 </div>
 

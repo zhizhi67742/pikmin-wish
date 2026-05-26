@@ -235,6 +235,26 @@ function buildTimeOptions() {
   document.getElementById("endHour").value = "20";
 }
 
+
+function getWishColorOptions(baseColors) {
+  const colors = Array.isArray(baseColors) && baseColors.length ? baseColors.slice() : ["白", "黃", "紅", "藍"];
+  const uniqueColors = colors.filter(function (color, index) { return colors.indexOf(color) === index; });
+  if (uniqueColors.length >= 2) {
+    if (!uniqueColors.includes("混色")) uniqueColors.push("混色");
+    if (!uniqueColors.includes("隨意色")) uniqueColors.push("隨意色");
+  }
+  return uniqueColors;
+}
+
+function getWishColorLabel(color) {
+  return String(color || "").endsWith("色") ? color : color + "色";
+}
+
+function buildWishFlowerName(color, flowerName) {
+  if (!flowerName || !color) return "";
+  return getWishColorLabel(color) + flowerName;
+}
+
 function initFlowerPicker() {
   const comboInput = document.getElementById("flowerComboInput") || document.getElementById("flowerKeywordInput");
   const dropdown = document.getElementById("flowerComboDropdown");
@@ -310,13 +330,13 @@ function initFlowerPicker() {
     const flowerName = getTypedFlowerName();
     const selectedFlower = findFlowerByName(flowerName);
     const currentColor = colorSelect.value;
-    const colors = selectedFlower ? selectedFlower.colors : allColors;
+    const colors = getWishColorOptions(selectedFlower ? selectedFlower.colors : allColors);
 
     colorSelect.innerHTML = "";
     colors.forEach(function (color) {
       const option = document.createElement("option");
       option.value = color;
-      option.textContent = color + "色";
+      option.textContent = getWishColorLabel(color);
       colorSelect.appendChild(option);
     });
 
@@ -330,7 +350,7 @@ function initFlowerPicker() {
   function updateSelectedFlowerInput() {
     const flowerName = getTypedFlowerName();
     const color = colorSelect.value;
-    flowerInput.value = flowerName && color ? color + "色" + flowerName : "";
+    flowerInput.value = buildWishFlowerName(color, flowerName);
   }
 
   comboInput.oninput = function () {
@@ -692,7 +712,7 @@ function deleteWish(id) {
     return;
   }
 
-  if (!confirm("確定要刪除這個願望嗎？")) return;
+  
 
   const deletedWish = wishes[wishIndex];
   const deletedKey = String(deletedWish.firebaseId || deletedWish.id || id || "");
@@ -803,6 +823,7 @@ function openDoneModal(id) {
   }
 
   selectedPendingId = id;
+  setDoneModalText(false);
 
   // 每次打開新的完成視窗都清空欄位，避免沿用上一筆已送出的座標/採收資訊。
   const harvestInput = document.getElementById("harvestInfoInput");
@@ -813,8 +834,49 @@ function openDoneModal(id) {
   document.getElementById("doneModal").classList.add("show");
 }
 
+function setDoneModalText(isFarmerShare) {
+  const title = document.getElementById("doneModalTitle");
+  const desc = document.getElementById("doneModalDesc");
+  if (!title || !desc) return;
+
+  if (isFarmerShare) {
+    title.textContent = "花農上傳座標";
+    desc.textContent = "請輸入採收資訊與分享地點，送出後會直接公開到已完成區。";
+  } else {
+    title.textContent = "完成分享";
+    desc.textContent = "請輸入採收資訊與分享地點。分享地點可以直接貼上多行座標。";
+  }
+}
+
+function openFarmerShareModal() {
+  const flower = document.getElementById("flowerInput")?.value?.trim();
+  const currentName = getCurrentNickname();
+
+  if (!currentName) {
+    alert("請先設定暱稱，才能上傳花農座標。");
+    openRuleModal();
+    return;
+  }
+
+  if (!flower) {
+    alert("請先選擇或輸入花種，再上傳座標。");
+    return;
+  }
+
+  selectedPendingId = "__farmer_direct_share__";
+  setDoneModalText(true);
+
+  const harvestInput = document.getElementById("harvestInfoInput");
+  const locationInput = document.getElementById("shareLocationInput");
+  if (harvestInput) harvestInput.value = "";
+  if (locationInput) locationInput.value = "";
+
+  document.getElementById("doneModal").classList.add("show");
+}
+
 function closeDoneModal() {
   selectedPendingId = null;
+  setDoneModalText(false);
   document.getElementById("doneModal").classList.remove("show");
 }
 
@@ -862,9 +924,6 @@ async function cancelTakeOrder(id) {
     return;
   }
 
-  const ok = confirm("確認取消接單？\n取消後訂單會重新開放，其他花農可以重新接單。");
-  if (!ok) return;
-
   const returnedWish = pending.splice(pendingIndex, 1)[0];
   const oldFarmer = returnedWish.farmer || returnedWish.acceptedBy || getCurrentNickname() || "花農";
 
@@ -900,7 +959,7 @@ async function cancelTakeOrder(id) {
 
   saveData();
   renderAll();
-  alert("已取消接單，訂單重新開放。\n取消原因：" + cleanReason);
+  
 }
 
 
@@ -986,17 +1045,22 @@ function getHistorySortTime(item) {
 
 function makeWishHistoryRecord(item, statusText) {
   const farmerName = item.farmer || item.acceptedBy || getCurrentNickname() || "花農";
-  const requesterName = item.nickname || item.requester || "許願者";
+  const isDirectShare = !!item.directShare;
+  const requesterName = isDirectShare ? "" : (item.nickname || item.requester || "許願者");
   const historyTimeSource = item.doneAt || item.cancelledAt || item.canceledAt || item.finishedAt || item.historyCreatedAt || item.createdAtSort || item.createdTimestamp || Date.now();
   const finishedTime = formatHistoryTime(historyTimeSource);
+  const stableDirectId = item.sourceWishId || item.id || item.firebaseId || item.historyId || "";
+  const stableNormalId = item.sourceWishId || item.firebaseId || item.id || item.historyId || "";
+  const stableId = isDirectShare ? stableDirectId : stableNormalId;
 
   return {
-    id: item.historyId || item.firebaseId || item.id || Date.now(),
-    sourceWishId: item.sourceWishId || item.firebaseId || item.id || "",
+    id: item.historyId || stableId || Date.now(),
+    sourceWishId: stableId,
     flower: item.flower || "花朵",
     farmer: farmerName,
     requester: requesterName,
-    status: statusText || item.status || "已完成",
+    status: isDirectShare ? (statusText || "花農分享") : (statusText || item.status || "已完成"),
+    directShare: isDirectShare,
     time: item.time || finishedTime,
     createdAt: item.createdAt || historyTimeSource,
     historyCreatedAt: getHistorySortTime({ ...item, time: item.time || finishedTime, historyCreatedAt: historyTimeSource }) || Date.now()
@@ -1016,6 +1080,9 @@ function formatHistoryTime(value) {
 function getWishHistoryUniqueKey(item) {
   const sourceKey = String(item.sourceWishId || item.id || item.firebaseId || "");
   if (sourceKey) {
+    if (item.directShare || String(item.requester || "").includes("花農直接分享") || String(item.status || "").includes("花農分享")) {
+      return sourceKey + "|directShare";
+    }
     return sourceKey + "|" + String(item.status || "");
   }
 
@@ -1082,6 +1149,11 @@ function renderWishHistory() {
     : "";
 
   list.innerHTML = header + pagedRecords.map(function (item) {
+    const isDirectShareHistory = item.directShare || String(item.requester || "").includes("花農直接分享") || String(item.status || "").includes("花農分享");
+    if (isDirectShareHistory) {
+      const directStatus = String(item.status || "") === "已完成" ? "花農分享" : (item.status || "花農分享");
+      return `<div class="wish-history-item">${escapeHtml(item.flower || "花朵")}｜${escapeHtml(item.farmer || "花農")}｜${escapeHtml(directStatus)}｜${escapeHtml(item.time || "")}</div>`;
+    }
     return `<div class="wish-history-item">${escapeHtml(item.flower || "花朵")}｜${escapeHtml(item.farmer || "花農")} → ${escapeHtml(item.requester || "許願者")}｜${escapeHtml(item.status || "已完成")}｜${escapeHtml(item.time || "")}</div>`;
   }).join("") + pagination;
 }
@@ -1114,6 +1186,85 @@ async function confirmDone() {
 
   if (!location) {
     alert("請輸入有效座標，例如：22.817601,89.563802");
+    return;
+  }
+
+  if (selectedPendingId === "__farmer_direct_share__") {
+    const flower = document.getElementById("flowerInput")?.value?.trim();
+    const currentName = getCurrentNickname();
+
+    if (!currentName) {
+      alert("請先設定暱稱，才能上傳花農座標。");
+      return;
+    }
+
+    if (!flower) {
+      alert("請先選擇或輸入花種。");
+      return;
+    }
+
+    const startHour = document.getElementById("startHour")?.value || "14";
+    const startMinute = document.getElementById("startMinute")?.value || "00";
+    const endHour = document.getElementById("endHour")?.value || "20";
+    const endMinute = document.getElementById("endMinute")?.value || "00";
+    const message = document.getElementById("messageInput")?.value?.trim() || "花農直接分享";
+
+    const directItem = {
+      id: Date.now(),
+      flower: flower,
+      nickname: "",
+      requester: "",
+      farmer: currentName,
+      acceptedBy: currentName,
+      farmerPlatform: getCurrentPlatform(),
+      acceptedByPlatform: getCurrentPlatform(),
+      requesterPlatform: "",
+      createdAt: formatNow(),
+      createdTimestamp: Date.now(),
+      timeRange: `${startHour}:${startMinute} - ${endHour}:${endMinute}`,
+      message: message,
+      harvestInfo: harvestInfo || "沒有補充採收資訊",
+      location: location,
+      doneAt: Date.now(),
+      deleteAt: Date.now() + 60 * 60 * 1000,
+      likes: 0,
+      liked: false,
+      status: "done",
+      directShare: true
+    };
+
+    const historyRecord = makeWishHistoryRecord(directItem, "花農分享");
+
+    if (window.firebaseDB && window.firebaseFns) {
+      const { collection, addDoc } = window.firebaseFns;
+      try {
+        await addDoc(collection(window.firebaseDB, "wishes"), directItem);
+      } catch (error) {
+        console.error("Firebase 花農座標同步失敗", error);
+        done.push(directItem);
+        alert("雲端同步失敗，已先暫存在本機。請重新整理後確認是否有上傳成功。");
+      }
+    } else {
+      done.push(directItem);
+    }
+
+    addLocalWishHistory(historyRecord);
+    await syncWishHistoryToCloud(historyRecord);
+
+    selectedPendingId = null;
+    document.getElementById("shareLocationInput").value = "";
+    document.getElementById("harvestInfoInput").value = "";
+    document.getElementById("messageInput").value = "";
+    document.getElementById("flowerInput").value = "";
+    resetFlowerPicker();
+
+    closeDoneModal();
+    document.getElementById("uploadConfirmModal").classList.remove("show");
+
+    alert("已上傳到已完成區。\n提醒：這邊不會自動通知，請記得貼到種花群喔！");
+
+    saveData();
+    renderAll();
     return;
   }
 
@@ -1275,11 +1426,14 @@ function renderDone() {
     const doneKey = getWishKey(item);
     item.liked = hasLikedDoneKey(doneKey);
 
+    const donePeopleHtml = item.directShare
+      ? `<p>📍 分享類型：花農直接上傳</p><p>🌱 分享花農：${displayNameWithTagHtml(item.farmer, item.farmerPlatform || item.acceptedByPlatform)}</p>`
+      : `<p>👤 發願者：${displayNameWithTagHtml(item.nickname, item.requesterPlatform || item.platform)}</p><p>🌱 接單花農：${displayNameWithTagHtml(item.farmer, item.farmerPlatform || item.acceptedByPlatform)}</p>`;
+
     list.innerHTML += `
       <article class="card">
         <h3>✨ ${escapeHtml(item.flower)}</h3>
-        <p>👤 發願者：${displayNameWithTagHtml(item.nickname, item.requesterPlatform || item.platform)}</p>
-        <p>🌱 接單花農：${displayNameWithTagHtml(item.farmer, item.farmerPlatform || item.acceptedByPlatform)}</p>
+        ${donePeopleHtml}
         <p>🌼 採收資訊：${escapeHtml(item.harvestInfo)}</p>
         <p>📍 分享地點／座標：</p>
         <pre class="coord-list" id="coord-${item.id}">${escapeHtml(item.location).replace(/\\n/g, "\n")}</pre>
@@ -2105,7 +2259,9 @@ async function startFirebaseSync() {
       } else if (data.status === "done") {
         data.farmer = data.farmer || data.acceptedBy || "花農";
         done.push(data);
-        addLocalWishHistory(makeWishHistoryRecord(data, "已完成"));
+        if (!data.directShare) {
+          addLocalWishHistory(makeWishHistoryRecord(data, "已完成"));
+        }
       } else {
         wishes.push(data);
       }
@@ -2682,18 +2838,18 @@ window.updateCurrentNicknameBar = updateCurrentNicknameBar;
     function updateHiddenValue() {
       const name = input.value.trim();
       const color = colorSelect.value;
-      hiddenInput.value = name && color ? color + "色" + name : "";
+      hiddenInput.value = buildWishFlowerName(color, name);
     }
 
     function renderColors() {
       const current = colorSelect.value;
       const found = findFlower(input.value);
-      const colors = found && Array.isArray(found.colors) && found.colors.length ? found.colors : defaultColors;
+      const colors = getWishColorOptions(found && Array.isArray(found.colors) && found.colors.length ? found.colors : defaultColors);
       colorSelect.innerHTML = "";
       colors.forEach(function (color) {
         const option = document.createElement("option");
         option.value = color;
-        option.textContent = color + "色";
+        option.textContent = getWishColorLabel(color);
         colorSelect.appendChild(option);
       });
       if (colors.includes(current)) colorSelect.value = current;
