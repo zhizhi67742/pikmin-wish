@@ -3973,7 +3973,7 @@ h1 {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 660px !important;
-  margin-left: auto !important;
+  margin-left: 0 !important;
   margin-right: auto !important;
 }
 
@@ -3982,7 +3982,7 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 12px !important;
   align-items: stretch !important;
-  justify-content: center !important;
+  justify-content: start !important;
   position: static !important;
   float: none !important;
   clear: both !important;
@@ -4028,5 +4028,75 @@ h1 {
 @media (max-width: 520px) {
   #wish .panel .wish-actions-fixed {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* === v1.2.1 FINAL DEPLOY FIX: 花農直接上傳座標按鈕置中 ===
+   放在 CSS 最底部，專門覆蓋前面所有舊的 flex/grid/margin 規則。 */
+#wish .panel .wish-actions-fixed {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 660px !important;
+  margin: 14px auto 0 auto !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  position: static !important;
+  float: none !important;
+  clear: both !important;
+  transform: none !important;
+  text-align: center !important;
+}
+
+#wish .panel .wish-actions-fixed > .primary-btn,
+#wish .panel .wish-actions-fixed > .farmer-share-btn {
+  box-sizing: border-box !important;
+  position: static !important;
+  inset: auto !important;
+  float: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 1 260px !important;
+  width: auto !important;
+  max-width: 320px !important;
+  min-width: 220px !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 13px 18px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  transform: none !important;
+}
+
+#wish .panel .wish-actions-fixed > .farmer-share-btn {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 640px) {
+  #wish .panel .wish-actions-fixed {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  #wish .panel .wish-actions-fixed > .primary-btn,
+  #wish .panel .wish-actions-fixed > .farmer-share-btn {
+    width: min(100%, 340px) !important;
+    max-width: 340px !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
