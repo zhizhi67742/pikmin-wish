@@ -731,7 +731,6 @@ async function addWish() {
 
   nickname = getCurrentNickname();
 
-  if (!requireGoogleLogin("新增願望")) return;
 
   if (!nickname) {
     alert("請先設定暱稱，建議使用 LINE 社群暱稱。");
@@ -963,7 +962,6 @@ function closeConfirmModal() {
 }
 
 function confirmTakeOrder() {
-  if (!requireGoogleLogin("接單")) return;
 
   nickname = getCurrentNickname();
 
@@ -2770,8 +2768,7 @@ async function startFirebaseSync() {
     const flower = document.getElementById("flowerInput")?.value?.trim();
     const nickname = getCurrentNickname();
 
-    if (!requireGoogleLogin("新增願望")) return;
-
+  
     if (!nickname) {
       alert("請先輸入 LINE 社群暱稱，才能新增願望。");
       openRuleModal();
@@ -2827,8 +2824,7 @@ async function startFirebaseSync() {
 
   // 接單同步
   window.acceptWish = async function(firebaseId) {
-    if (!requireGoogleLogin("接單")) return;
-    const nickname = localStorage.getItem("flowerWishNickname") || "花農";
+      const nickname = localStorage.getItem("flowerWishNickname") || "花農";
 
     const target = wishes.find(w => w.firebaseId === firebaseId);
 
