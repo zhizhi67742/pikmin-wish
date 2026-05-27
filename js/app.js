@@ -1,5 +1,9 @@
 const expandedCoordMap = new Map();
 let nickname = "";
+let currentUser = null;
+let currentUserUid = "";
+let currentUserName = "";
+let isGoogleLoginReady = false;
 let essenceLimit = 1200;
 let petalLimit = 1200;
 
@@ -37,6 +41,80 @@ function getCurrentNickname() {
   return "";
 }
 
+function getCurrentUserId() {
+  return currentUserUid || (window.firebaseAuth && window.firebaseAuth.currentUser ? window.firebaseAuth.currentUser.uid : "");
+}
+
+function getCurrentUserDisplayName() {
+  const user = currentUser || (window.firebaseAuth && window.firebaseAuth.currentUser);
+  return user ? (user.displayName || user.email || "") : "";
+}
+
+function isLoggedInWithGoogle() {
+  return !!getCurrentUserId();
+}
+
+function requireGoogleLogin(actionText) {
+  if (isLoggedInWithGoogle()) return true;
+  alert((actionText || "使用這個功能") + "前，請先使用 Google 登入。");
+  if (typeof loginWithGoogle === "function") loginWithGoogle();
+  return false;
+}
+
+function isCurrentUserOwner(item) {
+  const uid = getCurrentUserId();
+  if (uid && item && item.ownerUid) return String(item.ownerUid) === String(uid);
+  return item && getCurrentNickname() && String(getCurrentNickname()).trim() === String(item.nickname || "").trim();
+}
+
+function isCurrentUserFarmer(item) {
+  const uid = getCurrentUserId();
+  if (uid && item && item.farmerUid) return String(item.farmerUid) === String(uid);
+  return isCurrentFarmer(item);
+}
+
+function updateGoogleLoginDisplay() {
+  const btn = document.getElementById("googleLoginBtn");
+  const status = document.getElementById("googleLoginStatus");
+  if (status) {
+    status.textContent = currentUser
+      ? "已登入：" + (currentUser.displayName || currentUser.email || "Google 使用者")
+      : "尚未使用 Google 登入";
+  }
+  if (btn) {
+    btn.textContent = currentUser ? "切換 Google 帳號" : "使用 Google 登入";
+  }
+}
+
+async function loginWithGoogle() {
+  if (!window.firebaseAuth || !window.firebaseFns || !window.firebaseFns.GoogleAuthProvider) {
+    alert("Firebase 登入功能尚未載入完成，請稍後再試。");
+    return;
+  }
+
+  const provider = new window.firebaseFns.GoogleAuthProvider();
+  try {
+    await window.firebaseFns.signInWithPopup(window.firebaseAuth, provider);
+  } catch (error) {
+    console.error("Google 登入失敗", error);
+    if (error && error.code === "auth/unauthorized-domain") {
+      alert("Google 登入失敗：請到 Firebase Authentication → Settings → Authorized domains 加入 zhizhi67742.github.io");
+    } else if (error && error.code === "auth/popup-blocked") {
+      alert("瀏覽器阻擋了 Google 登入視窗，請允許彈出視窗後再試一次。");
+    } else {
+      alert("Google 登入失敗，請稍後再試。");
+    }
+  }
+}
+
+async function logoutGoogle() {
+  if (window.firebaseAuth && window.firebaseFns && window.firebaseFns.signOut) {
+    await window.firebaseFns.signOut(window.firebaseAuth);
+  }
+}
+
+window.loginWithGoogle = loginWithGoogle;
+window.logoutGoogle = logoutGoogle;
 
 function normalizeNicknameOnly(value) {
   return String(value || "").trim().replace(/_(LINE|DC)$/i, "");
@@ -653,6 +731,8 @@ async function addWish() {
 
   nickname = getCurrentNickname();
 
+  if (!requireGoogleLogin("新增願望")) return;
+
   if (!nickname) {
     alert("請先設定暱稱，建議使用 LINE 社群暱稱。");
     return;
@@ -679,6 +759,8 @@ async function addWish() {
     id: Date.now(),
     flower: flower,
     nickname: nickname,
+    ownerUid: getCurrentUserId(),
+    ownerName: getCurrentUserDisplayName(),
     createdAt: formatNow(),
     timeRange: start + " - " + end,
     deleteAt: getWishDeleteAtThreeDaysLater(),
@@ -835,7 +917,7 @@ function deleteWish(id) {
     return;
   }
 
-  if (String(getCurrentNickname()).trim() !== String(wish.nickname).trim()) {
+  if (!isCurrentUserOwner(wish)) {
     alert("只有原許願者可以刪除。");
     return;
   }
@@ -881,6 +963,8 @@ function closeConfirmModal() {
 }
 
 function confirmTakeOrder() {
+  if (!requireGoogleLogin("接單")) return;
+
   nickname = getCurrentNickname();
 
   if (!nickname) {
@@ -918,6 +1002,7 @@ function confirmTakeOrder() {
   takenWishes.forEach(function (wish) {
     wish.farmer = nickname;
     wish.acceptedBy = nickname;
+    wish.farmerUid = getCurrentUserId();
     wish.farmerPlatform = getCurrentPlatform();
     wish.acceptedByPlatform = getCurrentPlatform();
     wish.acceptedAt = acceptedAt;
@@ -929,6 +1014,7 @@ function confirmTakeOrder() {
       updateDoc(doc(window.firebaseDB, "wishes", wish.firebaseId), {
         acceptedBy: nickname,
         farmer: nickname,
+        farmerUid: getCurrentUserId(),
         acceptedByPlatform: getCurrentPlatform(),
         farmerPlatform: getCurrentPlatform(),
         acceptedAt: wish.acceptedAt,
@@ -959,7 +1045,7 @@ function openDoneModal(id) {
 
   if (!targets.length) return;
 
-  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
+  if (!targets.every(function (item) { return isCurrentUserFarmer(item); })) {
     alert("只有接單花農可以按完成分享。");
     return;
   }
@@ -1050,7 +1136,7 @@ async function cancelTakeOrder(id) {
 
   const targets = targetIndexes.map(function (index) { return pending[index]; });
 
-  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
+  if (!targets.every(function (item) { return isCurrentUserFarmer(item); })) {
     alert("只有接單花農可以取消接單。");
     return;
   }
@@ -1094,6 +1180,7 @@ async function cancelTakeOrder(id) {
           status: "wish",
           farmer: "",
           acceptedBy: "",
+          farmerUid: "",
           acceptedAt: "",
           cancelReason: cleanReason,
           lastCancelReason: cleanReason,
@@ -1434,7 +1521,7 @@ async function confirmDone() {
 
   const targets = targetIndexes.map(function (index) { return pending[index]; });
 
-  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
+  if (!targets.every(function (item) { return isCurrentUserFarmer(item); })) {
     alert("只有接單花農可以送出完成分享。");
     return;
   }
@@ -2592,6 +2679,16 @@ async function startFirebaseSync() {
     getDoc
   } = window.firebaseFns;
 
+  if (window.firebaseAuth && window.firebaseFns.onAuthStateChanged && !isGoogleLoginReady) {
+    isGoogleLoginReady = true;
+    window.firebaseFns.onAuthStateChanged(window.firebaseAuth, function(user) {
+      currentUser = user || null;
+      currentUserUid = user ? user.uid : "";
+      currentUserName = user ? (user.displayName || user.email || "") : "";
+      updateGoogleLoginDisplay();
+    });
+  }
+
   const wishesRef = collection(db, "wishes");
   const wishHistoryRef = collection(db, "wishHistory");
 
@@ -2673,6 +2770,8 @@ async function startFirebaseSync() {
     const flower = document.getElementById("flowerInput")?.value?.trim();
     const nickname = getCurrentNickname();
 
+    if (!requireGoogleLogin("新增願望")) return;
+
     if (!nickname) {
       alert("請先輸入 LINE 社群暱稱，才能新增願望。");
       openRuleModal();
@@ -2705,6 +2804,8 @@ async function startFirebaseSync() {
     const newWish = {
       flower,
       nickname,
+      ownerUid: getCurrentUserId(),
+      ownerName: getCurrentUserDisplayName(),
       requesterPlatform: getCurrentPlatform(),
       createdAt: now.toLocaleString(),
       timeRange: `${startHour}:${startMinute} - ${endHour}:${endMinute}`,
@@ -2726,6 +2827,7 @@ async function startFirebaseSync() {
 
   // 接單同步
   window.acceptWish = async function(firebaseId) {
+    if (!requireGoogleLogin("接單")) return;
     const nickname = localStorage.getItem("flowerWishNickname") || "花農";
 
     const target = wishes.find(w => w.firebaseId === firebaseId);
@@ -2739,6 +2841,7 @@ async function startFirebaseSync() {
     await updateDoc(doc(db, "wishes", firebaseId), {
       acceptedBy: nickname,
       farmer: nickname,
+      farmerUid: getCurrentUserId(),
       acceptedByPlatform: getCurrentPlatform(),
       farmerPlatform: getCurrentPlatform(),
       acceptedAt: formatNow(),
@@ -2762,6 +2865,8 @@ function enterWebsite() {
     alert("請輸入 LINE 社群或 DC 暱稱");
     return;
   }
+
+  if (!requireGoogleLogin("進入網站")) return;
 
   const saved = setNicknameAndPlatform(rawNickname, platform);
   nickname = saved.name;

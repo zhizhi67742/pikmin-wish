@@ -127,6 +127,40 @@
   }
 }
 
+
+.google-login-box{
+  margin:12px 0;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:rgba(255,255,255,.05);
+}
+.google-login-status{
+  margin:0 0 8px;
+  font-size:13px;
+  color:rgba(245,247,244,.82);
+}
+.google-login-btn{
+  width:100%;
+  border:0;
+  border-radius:999px;
+  padding:11px 16px;
+  cursor:pointer;
+  font-weight:800;
+  background:#fff;
+  color:#263238;
+}
+.google-logout-btn{
+  width:100%;
+  margin-top:8px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:9px 14px;
+  cursor:pointer;
+  background:rgba(255,255,255,.08);
+  color:#f5f7f4;
+}
+
 </style>
 
 <style>
@@ -789,6 +823,13 @@ h1 {
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import {
       getFirestore,
       collection,
       addDoc,
@@ -814,8 +855,10 @@ const firebaseConfig = {
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
     window.firebaseDB = db;
+    window.firebaseAuth = auth;
     window.firebaseFns = {
       collection,
       addDoc,
@@ -824,7 +867,11 @@ const firebaseConfig = {
       doc,
       onSnapshot,
       setDoc,
-      getDoc
+      getDoc,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
     };
 
     window.dispatchEvent(new Event("firebase-ready"));
@@ -880,6 +927,12 @@ const firebaseConfig = {
       <p class="nickname-tip">
         ※ 請使用 LINE 社群或 DC 暱稱，方便 @提醒
       </p>
+
+      <div class="google-login-box">
+        <p id="googleLoginStatus" class="google-login-status">尚未使用 Google 登入</p>
+        <button type="button" id="googleLoginBtn" class="google-login-btn" onclick="loginWithGoogle()">使用 Google 登入</button>
+        <button type="button" class="google-logout-btn" onclick="logoutGoogle()">登出 Google</button>
+      </div>
 
       <button type="button" id="enterWebsiteBtn" class="enter-btn" onclick="return window.enterWebsite(event)">
         進入網站
