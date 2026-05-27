@@ -202,7 +202,7 @@ button:hover {
 .form-grid {
   display: grid;
   grid-template-columns: minmax(0, 660px);
-  gap: 10px;
+  gap: 4px;
   align-items: start;
   padding-left: 26px;
 }
@@ -323,7 +323,7 @@ label textarea {
 
 .done-actions {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   margin-top: 14px;
   flex-wrap: wrap;
 }
@@ -333,7 +333,7 @@ label textarea {
   flex: 1;
   min-width: 120px;
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 6px 14px;
   font-weight: 900;
 }
 
@@ -407,7 +407,7 @@ label textarea {
 
 .coord-input {
   min-height: 135px;
-  max-height: 220px;
+  max-height: 120px;
   resize: vertical;
   line-height: 1.65;
   white-space: pre-wrap;
@@ -420,7 +420,7 @@ label textarea {
   background: rgba(0,0,0,0.22);
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: 16px;
-  padding: 12px;
+  padding: 6px;
   color: white;
   line-height: 1.65;
   font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
@@ -452,6 +452,29 @@ label textarea {
   background: #ffd966;
   color: #1e2d3d;
 }
+
+.modal-actions button {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .modal-actions {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .modal-actions button {
+    font-size: 14px;
+    padding: 12px 8px;
+  }
+
+  .modal-box {
+    width: calc(100vw - 32px);
+    max-width: 420px;
+  }
+}
+
 
 .dex-list {
   display: grid;
@@ -494,7 +517,7 @@ label textarea {
 
 .dex-table th,
 .dex-table td {
-  padding: 12px;
+  padding: 6px;
   border-bottom: 1px solid rgba(255,255,255,0.16);
   text-align: left;
 }
@@ -614,7 +637,7 @@ label textarea {
 }
 
 .dex-content {
-  padding: 14px;
+  padding: 8px;
 }
 
 .dex-table {
@@ -677,7 +700,7 @@ label textarea {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 14px 22px !important;
+  padding: 8px 22px !important;
 }
 
 /* remove giant empty area */
@@ -768,7 +791,7 @@ label textarea {
   top: calc(100% + 6px);
   z-index: 60;
   display: none;
-  max-height: 220px;
+  max-height: 120px;
   overflow-y: auto;
   padding: 6px;
   border: 1px solid rgba(255,255,255,0.18);
@@ -828,7 +851,7 @@ label textarea {
 .dex-search-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
 }
 
 .dex-search-panel input {
@@ -837,7 +860,7 @@ label textarea {
   background: rgba(0,0,0,0.24);
   border: 1px solid rgba(255, 217, 102, 0.35);
   border-radius: 999px;
-  padding: 14px 20px;
+  padding: 8px 20px;
   font-weight: 700;
 }
 
@@ -862,7 +885,7 @@ label textarea {
 .dex-advanced-panel {
   display: none;
   margin-top: 10px;
-  padding: 12px;
+  padding: 6px;
   border-radius: 18px;
   background: rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(255, 217, 102, 0.22);
@@ -876,7 +899,7 @@ label textarea {
   display: grid;
   grid-template-columns: 92px 1fr;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   padding: 8px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
@@ -922,7 +945,7 @@ label textarea {
 /* Move limit inputs inward */
 .limit-settings {
   margin-right: 40px;
-  gap: 10px !important;
+  gap: 4px !important;
 }
 
 .limit-settings label {
@@ -1103,7 +1126,7 @@ label textarea {
   width: 100%;
   margin-top: 12px;
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 6px 14px;
   background: rgba(255,255,255,0.15);
   color: white;
   font-weight: 900;
@@ -1198,7 +1221,7 @@ label textarea {
 /* Upload coordinate confirmation preview */
 .confirm-preview {
   margin-top: 18px;
-  padding: 14px;
+  padding: 8px;
   border-radius: 16px;
   background: rgba(0,0,0,0.18);
   border: 1px solid rgba(255,255,255,0.14);
@@ -1217,13 +1240,13 @@ label textarea {
 .flower-picker {
   margin-top: 9px;
   display: grid;
-  gap: 10px;
+  gap: 4px;
 }
 
 .flower-picker-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(96px, 0.34fr);
-  gap: 10px;
+  gap: 4px;
 }
 
 .flower-picker-row.combo-row {
@@ -1296,6 +1319,8 @@ label textarea {
   background: rgba(23,30,40,0.96);
   border: 1px solid rgba(255,255,255,0.08);
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .nickname-modal h1 {
@@ -1305,7 +1330,9 @@ label textarea {
 }
 
 .rule-scroll {
-  max-height: 300px;
+  flex: 1;
+  min-height: 0;
+  max-height: 52vh;
   overflow-y: auto;
   margin-bottom: 24px;
   padding-right: 8px;
@@ -1431,12 +1458,12 @@ label textarea {
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
+  gap: 4px;
   flex-wrap:wrap;
   background:rgba(255,255,255,0.10);
   border:1px solid rgba(255,255,255,0.24);
   border-radius:18px;
-  padding:14px 18px;
+  padding: 8px 18px;
   color:rgba(255,255,255,0.9);
   backdrop-filter:blur(12px);
   box-shadow:0 16px 36px rgba(0,0,0,0.24);
@@ -1480,7 +1507,7 @@ label textarea {
 /* Wish card actions */
 .wish-actions {
   display: grid;
-  gap: 10px;
+  gap: 4px;
   margin-top: 16px;
 }
 
@@ -1495,7 +1522,7 @@ label textarea {
   color: #ffd6d6;
   font-weight: 900;
   border-radius: 17px;
-  padding: 12px 16px;
+  padding: 6px 16px;
   letter-spacing: 0.02em;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
 }
@@ -1557,7 +1584,7 @@ label textarea {
     font-size:14px !important;
     writing-mode:horizontal-tb !important;
     white-space:nowrap;
-    border-radius:0 !important;
+    border-radius:17px !important;
   }
 
   .status-full,
@@ -1567,7 +1594,7 @@ label textarea {
 
   .dex-title{
     font-size:18px !important;
-    padding:14px 16px !important;
+    padding: 8px 16px !important;
   }
 
   .flower-subtitle{
@@ -1745,7 +1772,7 @@ label textarea {
 
   .dex-title {
     font-size: 16px !important;
-    padding: 12px 12px !important;
+    padding: 6px 12px !important;
     line-height: 1.35 !important;
   }
 
@@ -2032,7 +2059,7 @@ label textarea {
 
 .update-section{
   margin-top:14px;
-  padding:14px 15px;
+  padding: 8px 15px;
   border-radius:20px;
   background:rgba(255,255,255,.06);
   border:1px solid rgba(127,163,90,.14);
@@ -2108,7 +2135,7 @@ label textarea {
   }
 
   .dex-search-panel input {
-    padding: 12px 14px;
+    padding: 6px 14px;
     font-size: 13px;
   }
 
@@ -2224,7 +2251,7 @@ label textarea {
 
 .terms-modal-scroll section{
   margin: 0 0 14px;
-  padding: 14px 15px;
+  padding: 8px 15px;
   border-radius: 18px;
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.12);
@@ -2290,7 +2317,7 @@ label textarea {
   }
 
   .terms-modal-scroll section{
-    padding: 12px;
+    padding: 6px;
     border-radius: 16px;
   }
 
@@ -2306,7 +2333,7 @@ label textarea {
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:10px;
+  gap: 4px;
   flex-wrap:wrap;
   margin: 10px auto 8px;
 }
@@ -2575,7 +2602,7 @@ label textarea {
 
   /* 花朵圖鑑搜尋卡片縮小 */
   .dex-search-panel{
-    padding: 12px 8px !important;
+    padding: 6px 8px !important;
     border-radius: 18px !important;
   }
 
@@ -2876,7 +2903,7 @@ label textarea {
   background: rgba(31, 43, 34, 0.98);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 6px 14px;
   font-size: 14px;
   line-height: 1.6;
   word-break: break-word;
@@ -2899,14 +2926,14 @@ label textarea {
 .wish-history-list{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap: 4px;
   margin-top:16px;
 }
 .wish-history-item{
   background: rgba(255,255,255,0.055);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 6px 14px;
   font-size: 14px;
   line-height: 1.6;
   word-break: break-word;
@@ -3890,7 +3917,7 @@ h1 {
   #doneModal {
     align-items: flex-start !important;
     overflow-y: auto !important;
-    padding: 12px 10px !important;
+    padding: 6px 10px !important;
   }
 
   #doneModal .modal-box-large {
@@ -3938,13 +3965,13 @@ h1 {
 
   #doneModal .modal-actions {
     flex-direction: row !important;
-    gap: 10px !important;
+    gap: 4px !important;
     margin-top: 14px !important;
   }
 
   #doneModal .modal-actions button {
     min-height: 50px !important;
-    padding: 12px 10px !important;
+    padding: 6px 10px !important;
     font-size: 16px !important;
     border-radius: 17px !important;
   }
@@ -3964,4 +3991,706 @@ h1 {
     padding-left: 6px !important;
     padding-right: 6px !important;
   }
+}
+
+
+/* FIX: 規則彈窗底部輸入區不跑版 */
+.nickname-input-wrap{
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+@media (max-height: 760px){
+  .nickname-modal{
+    max-height: 92vh;
+  }
+
+  .rule-scroll{
+    max-height: 45vh;
+  }
+}
+
+/* 風鈴草 5/31 前保留顯示但禁止選擇 */
+.flower-combo-option.is-disabled,
+.flower-combo-option:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.35);
+}
+
+
+/* ===== FIX：許願區新增「目前可接訂單」後，手機板三顆按鈕同排；待完成區維持兩顆 ===== */
+@media (max-width: 768px) {
+  .order-filter-tabs[data-filter-area="wishList"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .order-filter-tabs[data-filter-area="pendingList"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .order-filter-tabs[data-filter-area="wishList"] .order-filter-btn {
+    font-size: 10.5px !important;
+    letter-spacing: -0.7px !important;
+    padding: 0 3px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .order-filter-tabs[data-filter-area="wishList"] .order-filter-btn {
+    font-size: 9.2px !important;
+    letter-spacing: -0.8px !important;
+    padding: 0 2px !important;
+  }
+}
+
+
+.merged-wish-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+
+.merged-wish-list-scroll {
+  max-height: 135px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
+  overflow-anchor: none;
+}
+
+.merged-wish-list-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.merged-wish-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.24);
+  border-radius: 999px;
+}
+
+.merged-wish-list-scroll::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+}
+
+@media (max-width: 520px) {
+  .merged-wish-list-scroll {
+    max-height: 95px;
+  }
+}
+}
+
+.merged-wish-user {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.merged-wish-user:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Merged wish cards: keep help buttons visible inside each requester block */
+.merged-wish-user .wish-actions {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+}
+
+.merged-wish-user .help-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0 !important;
+}
+
+/* === Wish group detail modal: flower+color merged, exact-time grouped === */
+.wish-time-summary {
+  margin-top: 10px;
+  text-align: left;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 18px;
+  padding: 12px 14px;
+}
+
+.wish-time-summary p {
+  margin: 0 0 8px;
+  font-weight: 900;
+  color: #ffe28a;
+}
+
+.wish-time-summary ul,
+.pending-requesters ul {
+  margin: 0;
+  padding-left: 20px;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.7;
+}
+
+.detail-btn {
+  background: #ffd966;
+  color: #1e2d3d;
+  border: 0;
+  border-radius: 17px;
+  padding: 13px 18px;
+  font-weight: 900;
+  width: 100%;
+  cursor: pointer;
+}
+
+.wish-detail-box {
+  max-height: min(82vh, 720px);
+  display: flex;
+  flex-direction: column;
+}
+
+.wish-detail-content {
+  overflow-y: auto;
+  padding-right: 4px;
+  text-align: left;
+}
+
+.wish-detail-summary {
+  text-align: center;
+  margin-top: 0;
+  font-weight: 900;
+}
+
+.wish-time-group-detail {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.wish-time-group-detail h3 {
+  margin: 0 0 10px;
+  color: #ffe28a;
+  font-size: 18px;
+}
+
+.wish-detail-person {
+  padding: 10px 0;
+  border-top: 1px dashed rgba(255,255,255,0.18);
+}
+
+.wish-detail-person:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.wish-detail-person p {
+  margin: 4px 0;
+}
+
+.wish-time-group-detail .help-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.compact-delete-btn {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+}
+
+.pending-requesters {
+  text-align: left;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 18px;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+
+.pending-requesters p {
+  margin: 0 0 6px;
+  font-weight: 900;
+  color: #ffe28a;
+}
+
+@media (max-width: 640px) {
+  .wish-time-summary,
+  .pending-requesters,
+  .wish-time-group-detail {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .wish-time-group-detail h3 {
+    font-size: 16px;
+  }
+}
+
+
+/* 右側書籤快速跳轉 */
+html {
+  scroll-behavior: smooth;
+}
+
+#quick-wish,
+#quick-pending,
+#quick-done {
+  scroll-margin-top: 18px;
+}
+
+.quick-bookmark-nav {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  pointer-events: none;
+}
+
+.quick-bookmark-nav a {
+  pointer-events: auto;
+  display: block;
+  width: 46px;
+  padding: 10px 6px;
+  border-radius: 14px 0 0 14px;
+  border: 1px solid rgba(177, 220, 181, 0.95);
+  border-right: 0;
+  background: rgba(246, 255, 245, 0.94);
+  color: #2d6240;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.quick-bookmark-nav a:hover,
+.quick-bookmark-nav a:focus-visible {
+  transform: translateX(-4px);
+  background: #e8ffe9;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .quick-bookmark-nav {
+    right: 6px;
+    gap: 7px;
+  }
+
+  .quick-bookmark-nav a {
+    width: 40px;
+    padding: 8px 5px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .quick-bookmark-nav {
+    top: auto;
+    right: 8px;
+    bottom: 82px;
+    transform: none;
+  }
+
+  .quick-bookmark-nav a {
+    width: 38px;
+    padding: 7px 4px;
+    font-size: 10.5px;
+  }
+}
+
+/* 修正詳細資訊視窗內「我可以幫忙」按鈕跑版 */
+.wish-detail-modal .wish-time-group-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wish-detail-modal .wish-detail-people {
+  width: 100%;
+}
+
+.wish-detail-modal .wish-time-group-detail .help-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 4px 0 0 !important;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 17px;
+  background: #7dbb6f;
+  color: #1e2d3d;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.wish-detail-modal .wish-time-group-detail .help-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+@media (max-width: 640px) {
+  .wish-detail-modal {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .wish-detail-modal .wish-detail-box {
+    width: min(94vw, 540px);
+    max-height: 86vh;
+    padding: 22px 16px;
+  }
+
+  .wish-detail-modal .wish-time-group-detail .help-btn {
+    padding: 12px 14px;
+    border-radius: 15px;
+  }
+}
+
+
+/* 採收資訊快速複製按鈕 */
+.harvest-copy-row {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.harvest-copy-row #harvestInfoInput {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.harvest-copy-btn {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: #5f8f6d !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  cursor: pointer !important;
+  flex: 0 0 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.harvest-copy-btn:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 768px) {
+  #doneModal .harvest-copy-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  #doneModal .harvest-copy-row #harvestInfoInput {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin-top: 8px !important;
+  }
+
+  #doneModal .harvest-copy-row .harvest-copy-btn {
+    display: inline-flex !important;
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* === FINAL FIX: 統一所有操作按鈕大小（手機/電腦） === */
+.card .pending-actions,
+.card .done-actions,
+.modal-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+.card .pending-actions > button,
+.card .done-actions > button,
+.modal-actions > button {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  font-size: 15px !important;
+}
+
+.card .pending-actions {
+  margin-top: 16px !important;
+}
+
+.card .done-actions {
+  margin-top: 14px !important;
+}
+
+.card .pending-actions .done-btn,
+.card .pending-actions .cancel-take-btn {
+  margin-top: 0 !important;
+}
+
+.card .done-actions .like-btn,
+.card .done-actions .copy-btn {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+@media (max-width: 640px) {
+  /* 覆蓋前面 mobile 的 button { width:100%; }，避免同排按鈕被撐壞 */
+  .modal-actions > button,
+  .card .pending-actions > button,
+  .card .done-actions > button {
+    width: auto !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 8px !important;
+    font-size: 14px !important;
+  }
+
+  .modal-actions {
+    flex-direction: row !important;
+  }
+
+  .card .pending-actions,
+  .card .done-actions {
+    flex-direction: row !important;
+  }
+
+  .card .done-actions .copy-btn {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .modal-actions > button,
+  .card .pending-actions > button,
+  .card .done-actions > button {
+    font-size: 12.5px !important;
+    padding: 0 6px !important;
+  }
+}
+
+/* === FINAL FIX: restore rounded corners on confirm take-order buttons === */
+#confirmModal .modal-actions > button,
+#confirmModal .modal-actions .cancel-btn,
+#confirmModal .modal-actions .confirm-btn {
+  border-radius: 17px !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 640px) {
+  #confirmModal .modal-actions > button,
+  #confirmModal .modal-actions .cancel-btn,
+  #confirmModal .modal-actions .confirm-btn {
+    border-radius: 17px !important;
+  }
+}
+
+/* ===== FIX: 確認接單彈窗按鈕圓角恢復（覆蓋前面 border-radius:0） ===== */
+#confirmModal .modal-actions button,
+#confirmModal .modal-actions .confirm-btn,
+#confirmModal .modal-actions .cancel-btn {
+  border-radius: 17px !important;
+  overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+@media (max-width: 640px) {
+  #confirmModal .modal-actions button,
+  #confirmModal .modal-actions .confirm-btn,
+  #confirmModal .modal-actions .cancel-btn {
+    border-radius: 17px !important;
+    height: 42px !important;
+  }
+}
+
+/* ===== FIX: 上傳座標確認上傳按鈕圓角恢復 ===== */
+#uploadConfirmModal .modal-actions button,
+#uploadConfirmModal .modal-actions .confirm-btn,
+#uploadConfirmModal .modal-actions .cancel-btn,
+#doneModal .modal-actions button,
+#doneModal .modal-actions .confirm-btn,
+#doneModal .modal-actions .cancel-btn {
+  border-radius: 17px !important;
+  overflow: hidden !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+@media (max-width: 640px) {
+  #uploadConfirmModal .modal-actions button,
+  #uploadConfirmModal .modal-actions .confirm-btn,
+  #uploadConfirmModal .modal-actions .cancel-btn,
+  #doneModal .modal-actions button,
+  #doneModal .modal-actions .confirm-btn,
+  #doneModal .modal-actions .cancel-btn {
+    height: 42px !important;
+    min-height: 42px !important;
+    border-radius: 17px !important;
+  }
+}
+
+
+/* ===== FINAL MOBILE BUTTON RADIUS LOCK 20260527 =====
+   手機版先前有樣式把 .confirm-btn 蓋成直角，這段放在最後統一鎖定彈窗確認按鈕圓角。 */
+@media (max-width: 768px) {
+  #confirmModal .modal-actions > button.confirm-btn,
+  #confirmModal .modal-actions > button.cancel-btn,
+  #uploadConfirmModal .modal-actions > button.confirm-btn,
+  #uploadConfirmModal .modal-actions > button.cancel-btn,
+  #doneModal .modal-actions > button.confirm-btn,
+  #doneModal .modal-actions > button.cancel-btn {
+    border-radius: 17px !important;
+    -webkit-border-radius: 17px !important;
+    overflow: hidden !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+}
+
+
+/* 完成區卡片縮小 */
+.done-card,
+.completed-card,
+.history-card.done {
+  padding: 10px !important;
+  border-radius: 14px !important;
+}
+
+.done-card p,
+.completed-card p,
+.history-card.done p {
+  margin: 4px 0 !important;
+  line-height: 1.3 !important;
+  font-size: 14px !important;
+}
+
+.done-card h3,
+.completed-card h3,
+.history-card.done h3 {
+  margin-bottom: 6px !important;
+  font-size: 16px !important;
+}
+
+.done-actions {
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.done-actions button,
+.toggle-coord-btn {
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+}
+
+.coord-list {
+  margin-top: 4px !important;
+  padding: 8px !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+@media (max-width: 768px) {
+  .done-card,
+  .completed-card,
+  .history-card.done {
+    padding: 8px !important;
+  }
+
+  .done-card p,
+  .completed-card p,
+  .history-card.done p {
+    font-size: 13px !important;
+  }
+
+  .done-actions button,
+  .toggle-coord-btn {
+    min-height: 30px !important;
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+  }
+}
+
+
+.success-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(40, 120, 70, 0.95);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 99999;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  pointer-events: none;
+}
+
+.success-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+
+/* Precise center fix for flower/dex clear X buttons */
+.clearable-input .clear-input-btn {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 20px !important;
+  padding: 0 !important;
+}
+.clearable-input .clear-input-btn:hover {
+  transform: translateY(-50%) !important;
 }

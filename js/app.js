@@ -1,19 +1,9 @@
+const expandedCoordMap = new Map();
 let nickname = "";
 let essenceLimit = 1200;
 let petalLimit = 1200;
 
-let wishes = [
-  {
-    id: 999999,
-    flower: "白勿忘草",
-    nickname: "範例玩家",
-    createdAt: "2026/05/23 22:45",
-    timeRange: "14:00 - 23:00",
-    deleteAt: Date.now() + (1000 * 60 * 60 * 3),
-    message: "謝謝花農",
-    isExample: true
-  }
-];
+let wishes = [];
 
 let pending = [];
 let done = [];
@@ -142,57 +132,72 @@ function setLikedDoneKey(doneKey, liked) {
 }
 
 const DEFAULT_FLOWER_DEX = [
-  { name: "風鈴草", subtitle: "6月新花・目前無法獲得", colors: ["白", "紅", "藍"] },
-  { name: "勿忘草", colors: ["白", "黃", "紅", "藍"] },
-  { name: "週年玫瑰", colors: ["白", "黃", "紅", "藍"] },
-  { name: "銀蓮花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "九重葛", colors: ["白", "黃", "紅", "藍"] },
-  { name: "海芋", colors: ["白", "黃", "紅", "藍"] },
-  { name: "山茶花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "油菜花", colors: ["白", "黃", "藍"] },
-  { name: "康乃馨", colors: ["白", "黃", "紅", "藍"] },
-  { name: "嘉德麗雅蘭", colors: ["白", "黃", "紅", "藍"] },
-  { name: "雞冠花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "櫻花", colors: ["白"] },
-  { name: "菊花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "鐵線蓮", colors: ["白", "黃", "紅", "藍"] },
-  { name: "彼岸花", colors: ["白", "黃", "紅"] },
-  { name: "鈴蘭", colors: ["白", "紅"] },
-  { name: "大波斯菊", colors: ["白", "黃", "紅"] },
-  { name: "兔耳花", colors: ["白", "紅", "藍"] },
-  { name: "大理花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "石竹", colors: ["白", "紅", "藍"] },
-  { name: "小蒼蘭", colors: ["白", "黃", "紅", "藍"] },
-  { name: "龍膽", colors: ["白", "紅", "藍"] },
-  { name: "聖誕玫瑰", colors: ["白", "黃", "紅", "藍"] },
-  { name: "扶桑花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "風信子", colors: ["白", "黃", "紅", "藍"] },
-  { name: "繡球花", colors: ["白", "紅", "藍"] },
-  { name: "鳶尾花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "百合", colors: ["白", "黃", "紅"] },
-  { name: "萬壽菊", colors: ["白", "黃", "紅"] },
-  { name: "牽牛花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "蝴蝶蘭", colors: ["白", "黃", "紅", "藍"] },
-  { name: "水仙花", colors: ["白", "黃"] },
+  { name: "風鈴草", subtitle: "6月新花・目前無法獲得", colors: ["紅", "藍"], locked: true },
+  { name: "勿忘草", colors: ["黃", "紅", "藍"] },
+  { name: "週年玫瑰", colors: ["黃", "紅", "藍"] },
+  { name: "銀蓮花", colors: ["黃", "紅", "藍"] },
+  { name: "九重葛", colors: ["黃", "紅", "藍"] },
+  { name: "海芋", colors: ["黃", "紅", "藍"] },
+  { name: "山茶花", colors: ["黃", "紅", "藍"] },
+  { name: "油菜花", colors: ["黃", "藍"] },
+  { name: "康乃馨", colors: ["黃", "紅", "藍"] },
+  { name: "嘉德麗雅蘭", colors: ["黃", "紅", "藍"] },
+  { name: "雞冠花", colors: ["黃", "紅", "藍"] },
+  { name: "櫻花", colors: [] },
+  { name: "菊花", colors: ["黃", "紅", "藍"] },
+  { name: "鐵線蓮", colors: ["黃", "紅", "藍"] },
+  { name: "彼岸花", colors: ["黃", "紅"] },
+  { name: "鈴蘭", colors: ["紅"] },
+  { name: "大波斯菊", colors: ["黃", "紅"] },
+  { name: "兔耳花", colors: ["紅", "藍"] },
+  { name: "大理花", colors: ["黃", "紅", "藍"] },
+  { name: "石竹", colors: ["紅", "藍"] },
+  { name: "小蒼蘭", colors: ["黃", "紅", "藍"] },
+  { name: "龍膽", colors: ["紅", "藍"] },
+  { name: "聖誕玫瑰", colors: ["黃", "紅", "藍"] },
+  { name: "扶桑花", colors: ["黃", "紅", "藍"] },
+  { name: "風信子", colors: ["黃", "紅", "藍"] },
+  { name: "繡球花", colors: ["紅", "藍"] },
+  { name: "鳶尾花", colors: ["黃", "紅", "藍"] },
+  { name: "百合", colors: ["黃", "紅"] },
+  { name: "萬壽菊", colors: ["黃", "紅"] },
+  { name: "牽牛花", colors: ["黃", "紅", "藍"] },
+  { name: "蝴蝶蘭", colors: ["黃", "紅", "藍"] },
+  { name: "水仙花", colors: ["黃"] },
   { name: "粉蝶花", colors: ["藍"] },
-  { name: "睡蓮", colors: ["白", "黃", "紅", "藍"] },
-  { name: "三色堇", colors: ["白", "黃", "紅", "藍"] },
-  { name: "牡丹", colors: ["白", "黃", "紅", "藍"] },
-  { name: "矮牽牛", colors: ["白", "黃", "紅", "藍"] },
-  { name: "梅花", colors: ["白", "黃", "紅"] },
-  { name: "雞蛋花", colors: ["白", "黃", "紅"] },
-  { name: "聖誕紅", colors: ["白", "黃", "紅", "藍"] },
-  { name: "櫻草花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "玫瑰", colors: ["白", "黃", "紅", "藍"] },
-  { name: "鼠尾草", colors: ["白", "黃", "紅", "藍"] },
-  { name: "金魚草", colors: ["白", "黃", "紅", "藍"] },
-  { name: "雪花蓮", colors: ["白", "黃", "紅"] },
-  { name: "天堂鳥", colors: ["白", "黃", "紅"] },
+  { name: "睡蓮", colors: ["黃", "紅", "藍"] },
+  { name: "三色堇", colors: ["黃", "紅", "藍"] },
+  { name: "牡丹", colors: ["黃", "紅", "藍"] },
+  { name: "矮牽牛", colors: ["黃", "紅", "藍"] },
+  { name: "梅花", colors: ["黃", "紅"] },
+  { name: "雞蛋花", colors: ["黃", "紅"] },
+  { name: "聖誕紅", colors: ["黃", "紅", "藍"] },
+  { name: "櫻草花", colors: ["黃", "紅", "藍"] },
+  { name: "玫瑰", colors: ["黃", "紅", "藍"] },
+  { name: "鼠尾草", colors: ["黃", "紅", "藍"] },
+  { name: "金魚草", colors: ["黃", "紅", "藍"] },
+  { name: "雪花蓮", colors: ["黃", "紅"] },
+  { name: "天堂鳥", colors: ["黃", "紅"] },
   { name: "向日葵", colors: ["黃"] },
-  { name: "豌豆花", colors: ["白", "黃", "紅", "藍"] },
-  { name: "鬱金香", colors: ["白", "黃", "紅", "藍"] },
-  { name: "鸚鵡鬱金香", colors: ["白", "黃", "紅", "藍"] }
+  { name: "豌豆花", colors: ["黃", "紅", "藍"] },
+  { name: "鬱金香", colors: ["黃", "紅", "藍"] },
+  { name: "鸚鵡鬱金香", colors: ["黃", "紅", "藍"] }
 ];
+
+
+function isLockedFlowerName(name) {
+  const text = String(name || "").trim();
+  return text === "風鈴草" || /風鈴草/.test(text);
+}
+
+function isLockedWishFlowerValue(value) {
+  const text = String(value || "").trim();
+  return /風鈴草/.test(text);
+}
+
+function warnLockedFlower() {
+  alert("風鈴草 5/31 才會開放，目前先保留選項，暫時不能許願或上傳喔～");
+}
 
 let flowerDex = JSON.parse(JSON.stringify(DEFAULT_FLOWER_DEX));
 let dexFilterMode = "all";
@@ -237,7 +242,7 @@ function buildTimeOptions() {
 
 
 function getWishColorOptions(baseColors) {
-  const colors = Array.isArray(baseColors) && baseColors.length ? baseColors.slice() : ["白", "黃", "紅", "藍"];
+  const colors = Array.isArray(baseColors) && baseColors.length ? baseColors.slice() : ["黃", "紅", "藍"];
   const uniqueColors = colors.filter(function (color, index) { return colors.indexOf(color) === index; });
   if (uniqueColors.length >= 2) {
     if (!uniqueColors.includes("混色")) uniqueColors.push("混色");
@@ -251,7 +256,8 @@ function getWishColorLabel(color) {
 }
 
 function buildWishFlowerName(color, flowerName) {
-  if (!flowerName || !color) return "";
+  if (!flowerName) return "";
+  if (!color) return flowerName;
   return getWishColorLabel(color) + flowerName;
 }
 
@@ -263,7 +269,7 @@ function initFlowerPicker() {
 
   if (!comboInput || !colorSelect || !flowerInput) return;
 
-  const allColors = ["白", "黃", "紅", "藍"];
+  const allColors = ["黃", "紅", "藍"];
 
   function normalizeText(value) {
     return String(value || "").trim().toLowerCase();
@@ -311,11 +317,20 @@ function initFlowerPicker() {
     flowers.forEach(function (flower) {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "flower-combo-option";
+      btn.className = "flower-combo-option" + (flower.locked ? " is-disabled" : "");
       btn.setAttribute("role", "option");
       btn.textContent = flower.subtitle ? flower.name + "（" + flower.subtitle + "）" : flower.name;
+      if (flower.locked) {
+        btn.disabled = true;
+        btn.setAttribute("aria-disabled", "true");
+        btn.title = "5/31 才會開放，目前不能選擇";
+      }
       btn.addEventListener("mousedown", function (event) {
         event.preventDefault();
+        if (flower.locked) {
+          warnLockedFlower();
+          return;
+        }
         comboInput.value = flower.name;
         renderColorOptions();
         closeDropdown();
@@ -330,7 +345,34 @@ function initFlowerPicker() {
     const flowerName = getTypedFlowerName();
     const selectedFlower = findFlowerByName(flowerName);
     const currentColor = colorSelect.value;
-    const colors = getWishColorOptions(selectedFlower ? selectedFlower.colors : allColors);
+
+    if (selectedFlower && selectedFlower.locked) {
+      colorSelect.style.display = "";
+      colorSelect.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "5/31 開放後才能選";
+      colorSelect.appendChild(option);
+      flowerInput.value = "";
+      return;
+    }
+
+    const baseColors = selectedFlower && Array.isArray(selectedFlower.colors) ? selectedFlower.colors : null;
+
+    // 單色花：櫻花、向日葵、粉蝶花等，直接許願，不顯示顏色選單
+    if (selectedFlower && (!baseColors || baseColors.length <= 1)) {
+      colorSelect.style.display = "none";
+      colorSelect.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "單色花";
+      colorSelect.appendChild(option);
+      flowerInput.value = flowerName;
+      return;
+    }
+
+    colorSelect.style.display = "";
+    const colors = getWishColorOptions(baseColors || allColors);
 
     colorSelect.innerHTML = "";
     colors.forEach(function (color) {
@@ -350,6 +392,10 @@ function initFlowerPicker() {
   function updateSelectedFlowerInput() {
     const flowerName = getTypedFlowerName();
     const color = colorSelect.value;
+    if (isLockedFlowerName(flowerName)) {
+      flowerInput.value = "";
+      return;
+    }
     flowerInput.value = buildWishFlowerName(color, flowerName);
   }
 
@@ -414,6 +460,27 @@ function showSection(sectionId, btn) {
     item.classList.remove("active");
   });
   btn.classList.add("active");
+}
+
+
+function jumpToOrderSection(event, targetId) {
+  if (event) event.preventDefault();
+
+  const wishBtn = document.querySelector('.nav-btn[onclick*="showSection(\'wish\'"]') ||
+    document.querySelector('.nav-btn[onclick*="showSection(&quot;wish&quot;"]') ||
+    document.querySelector('.nav-btn');
+
+  if (typeof showSection === 'function' && wishBtn) {
+    showSection('wish', wishBtn);
+  }
+
+  setTimeout(function () {
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', '#' + targetId);
+    }
+  }, 60);
 }
 
 function saveNickname() {
@@ -500,7 +567,7 @@ function ensureRepeatWishModal() {
     }
     .repeat-wish-actions {
       display: flex;
-      gap: 10px;
+      gap: 4px;
       justify-content: center;
       flex-wrap: wrap;
     }
@@ -596,6 +663,12 @@ async function addWish() {
     return;
   }
 
+  if (isLockedWishFlowerValue(flower)) {
+    warnLockedFlower();
+    resetFlowerPicker();
+    return;
+  }
+
   const canSubmitRepeatWish = await askRepeatWishIfNeeded(flower, nickname);
   if (!canSubmitRepeatWish) return;
 
@@ -618,10 +691,34 @@ async function addWish() {
   document.getElementById("messageInput").value = "";
   saveData();
   renderAll();
+  alert("已成功送出許願 🌸");
 }
+
+
+function showSuccessToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "success-toast";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(function () {
+    toast.classList.add("show");
+  });
+
+  setTimeout(function () {
+    toast.classList.remove("show");
+
+    setTimeout(function () {
+      toast.remove();
+    }, 300);
+  }, 2200);
+}
+
 
 function openConfirmModal(id) {
   selectedWishId = id;
+  closeWishDetailModal();
   const modal = document.getElementById("confirmModal");
   if (modal) {
     modal.classList.add("show");
@@ -632,6 +729,13 @@ function openConfirmModal(id) {
 
 
 document.addEventListener("click", function (event) {
+  const detailBtn = event.target.closest(".detail-btn[data-detail-wish-key]");
+  if (detailBtn && !detailBtn.disabled) {
+    event.preventDefault();
+    openWishDetailModal(detailBtn.dataset.detailWishKey);
+    return;
+  }
+
   const helpBtn = event.target.closest(".help-btn[data-wish-key]");
   if (helpBtn && !helpBtn.disabled) {
     event.preventDefault();
@@ -664,10 +768,34 @@ document.addEventListener("click", function (event) {
   if (copyBtn) {
     event.preventDefault();
     copyCoords(copyBtn.dataset.doneKey);
+    return;
+  }
+
+  const toggleCoordBtn = event.target.closest(".toggle-coord-btn[data-target]");
+  if (toggleCoordBtn) {
+    event.preventDefault();
+
+    const targetId = toggleCoordBtn.dataset.target;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const isHidden = target.style.display === "none" || !target.style.display;
+
+    target.style.display = isHidden ? "block" : "none";
+    toggleCoordBtn.textContent = isHidden ? "隱藏詳細座標" : "顯示詳細座標";
+    expandedCoordMap.set(targetId, isHidden);
+
+    return;
   }
 });
 
 function bindDynamicButtons() {
+  document.querySelectorAll(".detail-btn[data-detail-wish-key]").forEach(function (btn) {
+    btn.onclick = function () {
+      openWishDetailModal(btn.dataset.detailWishKey);
+    };
+  });
+
   document.querySelectorAll(".help-btn[data-wish-key]").forEach(function (btn) {
     btn.onclick = function () {
       openConfirmModal(btn.dataset.wishKey);
@@ -761,43 +889,55 @@ function confirmTakeOrder() {
     return;
   }
 
-  const wishIndex = wishes.findIndex(function (item) {
-    return String(getWishKey(item)) === String(selectedWishId);
+  const selectedWishKeys = String(selectedWishId || "").split("||").filter(Boolean);
+  const selectedWishKeySet = new Set(selectedWishKeys);
+  const takeIndexes = [];
+
+  wishes.forEach(function (item, index) {
+    if (selectedWishKeySet.has(String(getWishKey(item)))) {
+      takeIndexes.push(index);
+    }
   });
 
-  if (wishIndex === -1) {
+  if (takeIndexes.length === 0) {
     closeConfirmModal();
     return;
   }
 
-  if (wishes[wishIndex].isExample) {
+  if (takeIndexes.some(function (index) { return wishes[index].isExample; })) {
     alert("範例卡不能接單。");
     closeConfirmModal();
     return;
   }
 
-  const wish = wishes.splice(wishIndex, 1)[0];
-  wish.farmer = nickname;
-  wish.acceptedBy = nickname;
-  wish.farmerPlatform = getCurrentPlatform();
-  wish.acceptedByPlatform = getCurrentPlatform();
-  wish.acceptedAt = formatNow();
-  wish.status = "pending";
-  pending.unshift(wish);
+  const acceptedAt = formatNow();
+  const takenWishes = takeIndexes.sort(function (a, b) { return b - a; }).map(function (index) {
+    return wishes.splice(index, 1)[0];
+  }).reverse();
 
-  if (wish.firebaseId && window.firebaseDB && window.firebaseFns) {
-    const { updateDoc, doc } = window.firebaseFns;
-    updateDoc(doc(window.firebaseDB, "wishes", wish.firebaseId), {
-      acceptedBy: nickname,
-      farmer: nickname,
-      acceptedByPlatform: getCurrentPlatform(),
-      farmerPlatform: getCurrentPlatform(),
-      acceptedAt: wish.acceptedAt,
-      status: "pending"
-    }).catch(function (error) {
-      console.error("Firebase 接單同步失敗", error);
-    });
-  }
+  takenWishes.forEach(function (wish) {
+    wish.farmer = nickname;
+    wish.acceptedBy = nickname;
+    wish.farmerPlatform = getCurrentPlatform();
+    wish.acceptedByPlatform = getCurrentPlatform();
+    wish.acceptedAt = acceptedAt;
+    wish.status = "pending";
+    pending.unshift(wish);
+
+    if (wish.firebaseId && window.firebaseDB && window.firebaseFns) {
+      const { updateDoc, doc } = window.firebaseFns;
+      updateDoc(doc(window.firebaseDB, "wishes", wish.firebaseId), {
+        acceptedBy: nickname,
+        farmer: nickname,
+        acceptedByPlatform: getCurrentPlatform(),
+        farmerPlatform: getCurrentPlatform(),
+        acceptedAt: wish.acceptedAt,
+        status: "pending"
+      }).catch(function (error) {
+        console.error("Firebase 接單同步失敗", error);
+      });
+    }
+  });
 
   closeConfirmModal();
   saveData();
@@ -811,13 +951,15 @@ function isCurrentFarmer(item) {
 }
 
 function openDoneModal(id) {
-  const target = pending.find(function (item) {
-    return String(getWishKey(item)) === String(id);
+  const selectedPendingKeys = String(id || "").split("||").filter(Boolean);
+  const keySet = new Set(selectedPendingKeys);
+  const targets = pending.filter(function (item) {
+    return keySet.has(String(getWishKey(item)));
   });
 
-  if (!target) return;
+  if (!targets.length) return;
 
-  if (!isCurrentFarmer(target)) {
+  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
     alert("只有接單花農可以按完成分享。");
     return;
   }
@@ -825,7 +967,6 @@ function openDoneModal(id) {
   selectedPendingId = id;
   setDoneModalText(false);
 
-  // 每次打開新的完成視窗都清空欄位，避免沿用上一筆已送出的座標/採收資訊。
   const harvestInput = document.getElementById("harvestInfoInput");
   const locationInput = document.getElementById("shareLocationInput");
   if (harvestInput) harvestInput.value = "";
@@ -897,20 +1038,24 @@ function hasSharedCoordinates(item) {
 }
 
 async function cancelTakeOrder(id) {
-  const pendingIndex = pending.findIndex(function (item) {
-    return String(getWishKey(item)) === String(id);
+  const selectedPendingKeys = String(id || "").split("||").filter(Boolean);
+  const keySet = new Set(selectedPendingKeys);
+  const targetIndexes = [];
+
+  pending.forEach(function (item, index) {
+    if (keySet.has(String(getWishKey(item)))) targetIndexes.push(index);
   });
 
-  if (pendingIndex === -1) return;
+  if (!targetIndexes.length) return;
 
-  const item = pending[pendingIndex];
+  const targets = targetIndexes.map(function (index) { return pending[index]; });
 
-  if (!isCurrentFarmer(item)) {
+  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
     alert("只有接單花農可以取消接單。");
     return;
   }
 
-  if (hasSharedCoordinates(item) || item.status === "done" || item.doneAt) {
+  if (targets.some(function (item) { return hasSharedCoordinates(item) || item.status === "done" || item.doneAt; })) {
     alert("已送出座標後不能取消接單。");
     return;
   }
@@ -924,44 +1069,47 @@ async function cancelTakeOrder(id) {
     return;
   }
 
-  const returnedWish = pending.splice(pendingIndex, 1)[0];
-  const oldFarmer = returnedWish.farmer || returnedWish.acceptedBy || getCurrentNickname() || "花農";
+  const returnedWishes = targetIndexes.sort(function (a, b) { return b - a; }).map(function (index) {
+    return pending.splice(index, 1)[0];
+  }).reverse();
 
-  returnedWish.cancelReason = cleanReason;
-  returnedWish.lastCancelReason = cleanReason;
-  returnedWish.lastCanceledBy = oldFarmer;
-  returnedWish.lastCanceledAt = formatNow();
-  returnedWish.farmer = "";
-  returnedWish.acceptedBy = "";
-  returnedWish.acceptedAt = "";
-  returnedWish.status = "wish";
+  for (const returnedWish of returnedWishes) {
+    const oldFarmer = returnedWish.farmer || returnedWish.acceptedBy || getCurrentNickname() || "花農";
 
-  wishes.unshift(returnedWish);
+    returnedWish.cancelReason = cleanReason;
+    returnedWish.lastCancelReason = cleanReason;
+    returnedWish.lastCanceledBy = oldFarmer;
+    returnedWish.lastCanceledAt = formatNow();
+    returnedWish.farmer = "";
+    returnedWish.acceptedBy = "";
+    returnedWish.acceptedAt = "";
+    returnedWish.status = "wish";
 
-  if (returnedWish.firebaseId && window.firebaseDB && window.firebaseFns) {
-    const { updateDoc, doc } = window.firebaseFns;
-    try {
-      await updateDoc(doc(window.firebaseDB, "wishes", returnedWish.firebaseId), {
-        status: "wish",
-        farmer: "",
-        acceptedBy: "",
-        acceptedAt: "",
-        cancelReason: cleanReason,
-        lastCancelReason: cleanReason,
-        lastCanceledBy: oldFarmer,
-        lastCanceledAt: returnedWish.lastCanceledAt
-      });
-    } catch (error) {
-      console.error("Firebase 取消接單同步失敗", error);
-      alert("本機已取消，但雲端同步失敗。請重新整理後確認訂單狀態。");
+    wishes.unshift(returnedWish);
+
+    if (returnedWish.firebaseId && window.firebaseDB && window.firebaseFns) {
+      const { updateDoc, doc } = window.firebaseFns;
+      try {
+        await updateDoc(doc(window.firebaseDB, "wishes", returnedWish.firebaseId), {
+          status: "wish",
+          farmer: "",
+          acceptedBy: "",
+          acceptedAt: "",
+          cancelReason: cleanReason,
+          lastCancelReason: cleanReason,
+          lastCanceledBy: oldFarmer,
+          lastCanceledAt: returnedWish.lastCanceledAt
+        });
+      } catch (error) {
+        console.error("Firebase 取消接單同步失敗", error);
+        alert("本機已取消，但雲端同步失敗。請重新整理後確認訂單狀態。");
+      }
     }
   }
 
   saveData();
   renderAll();
-  
 }
-
 
 function previewCleanCoords() {
   const input = document.getElementById("shareLocationInput");
@@ -1203,6 +1351,12 @@ async function confirmDone() {
       return;
     }
 
+    if (isLockedWishFlowerValue(flower)) {
+      warnLockedFlower();
+      resetFlowerPicker();
+      return;
+    }
+
     const startHour = document.getElementById("startHour")?.value || "14";
     const startMinute = document.getElementById("startMinute")?.value || "00";
     const endHour = document.getElementById("endHour")?.value || "20";
@@ -1268,50 +1422,59 @@ async function confirmDone() {
     return;
   }
 
-  const pendingIndex = pending.findIndex(function (item) {
-    return String(getWishKey(item)) === String(selectedPendingId);
+  const selectedPendingKeys = String(selectedPendingId || "").split("||").filter(Boolean);
+  const keySet = new Set(selectedPendingKeys);
+  const targetIndexes = [];
+
+  pending.forEach(function (item, index) {
+    if (keySet.has(String(getWishKey(item)))) targetIndexes.push(index);
   });
 
-  if (pendingIndex === -1) return;
+  if (!targetIndexes.length) return;
 
-  if (!isCurrentFarmer(pending[pendingIndex])) {
+  const targets = targetIndexes.map(function (index) { return pending[index]; });
+
+  if (!targets.every(function (item) { return isCurrentFarmer(item); })) {
     alert("只有接單花農可以送出完成分享。");
     return;
   }
 
-  const item = pending.splice(pendingIndex, 1)[0];
-  item.harvestInfo = harvestInfo || "沒有補充採收資訊";
-  item.location = location;
-  if (typeof item.id === "undefined") item.id = Date.now();
-  item.doneAt = Date.now();
-  item.deleteAt = Date.now() + 60 * 60 * 1000;
-  item.likes = 0;
-  item.liked = false;
+  const doneItems = targetIndexes.sort(function (a, b) { return b - a; }).map(function (index) {
+    return pending.splice(index, 1)[0];
+  }).reverse();
 
-  done.push(item);
+  for (const item of doneItems) {
+    item.harvestInfo = harvestInfo || "沒有補充採收資訊";
+    item.location = location;
+    if (typeof item.id === "undefined") item.id = Date.now();
+    item.doneAt = Date.now();
+    item.deleteAt = Date.now() + 60 * 60 * 1000;
+    item.likes = 0;
+    item.liked = false;
 
-  const historyRecord = makeWishHistoryRecord(item, "已完成");
-  addLocalWishHistory(historyRecord);
-  await syncWishHistoryToCloud(historyRecord);
+    done.push(item);
 
-  // 如果這筆願望來自 Firebase，要同步標記為完成。
-  // 否則即時同步會再次把它從雲端讀回「待完成」，看起來就像網站回朔。
-  if (item.firebaseId && window.firebaseDB && window.firebaseFns) {
-    const { updateDoc, doc } = window.firebaseFns;
-    try {
-      await updateDoc(doc(window.firebaseDB, "wishes", item.firebaseId), {
-        status: "done",
-        harvestInfo: item.harvestInfo,
-        location: item.location,
-        doneAt: item.doneAt,
-        deleteAt: item.deleteAt,
-        farmer: item.farmer || item.acceptedBy || nickname,
-        acceptedBy: item.acceptedBy || item.farmer || nickname,
-        likes: item.likes || 0
-      });
-    } catch (error) {
-      console.error("Firebase 完成同步失敗", error);
-      alert("本機已完成，但雲端同步失敗。請重新整理後確認是否還在待完成區。");
+    const historyRecord = makeWishHistoryRecord(item, "已完成");
+    addLocalWishHistory(historyRecord);
+    await syncWishHistoryToCloud(historyRecord);
+
+    if (item.firebaseId && window.firebaseDB && window.firebaseFns) {
+      const { updateDoc, doc } = window.firebaseFns;
+      try {
+        await updateDoc(doc(window.firebaseDB, "wishes", item.firebaseId), {
+          status: "done",
+          harvestInfo: item.harvestInfo,
+          location: item.location,
+          doneAt: item.doneAt,
+          deleteAt: item.deleteAt,
+          farmer: item.farmer || item.acceptedBy || nickname,
+          acceptedBy: item.acceptedBy || item.farmer || nickname,
+          likes: item.likes || 0
+        });
+      } catch (error) {
+        console.error("Firebase 完成同步失敗", error);
+        alert("本機已完成，但雲端同步失敗。請重新整理後確認是否還在待完成區。");
+      }
     }
   }
 
@@ -1337,47 +1500,219 @@ function renderAll() {
   bindDynamicButtons();
 }
 
+
+function timeRangeToDayIntervals(timeRange) {
+  const range = parseTimeRangeToMinutes(timeRange);
+  if (!range) return null;
+
+  // 一般區間：20:00 - 23:00
+  if (range.start <= range.end) {
+    return [{ start: range.start, end: range.end }];
+  }
+
+  // 跨日區間：21:00 - 03:00，拆成 21:00-24:00 與 00:00-03:00
+  return [
+    { start: range.start, end: 24 * 60 },
+    { start: 0, end: range.end }
+  ];
+}
+
+function timeRangesOverlap(timeRangeA, timeRangeB) {
+  const intervalsA = timeRangeToDayIntervals(timeRangeA);
+  const intervalsB = timeRangeToDayIntervals(timeRangeB);
+
+  if (!intervalsA || !intervalsB) {
+    return String(timeRangeA || "").trim() === String(timeRangeB || "").trim();
+  }
+
+  return intervalsA.some(function (a) {
+    return intervalsB.some(function (b) {
+      return Math.max(a.start, b.start) <= Math.min(a.end, b.end);
+    });
+  });
+}
+
+function getWishGroupKey(wish) {
+  return String(wish && wish.flower || "").trim();
+}
+
+function normalizeWishTimeRange(value) {
+  return String(value || "未設定").trim() || "未設定";
+}
+
+function groupByValue(items, getter) {
+  const map = new Map();
+  items.forEach(function (item) {
+    const key = getter(item);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(item);
+  });
+  return Array.from(map.entries()).map(function (entry) {
+    return { key: entry[0], items: entry[1] };
+  });
+}
+
+function groupWishesByFlower(wishList) {
+  return groupByValue(wishList, getWishGroupKey).map(function (group) {
+    return group.items;
+  });
+}
+
+function groupWishesByExactTime(wishList) {
+  return groupByValue(wishList, function (wish) {
+    return normalizeWishTimeRange(wish.timeRange);
+  });
+}
+
+function ensureWishDetailModal() {
+  let modal = document.getElementById("wishDetailModal");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.id = "wishDetailModal";
+  modal.className = "modal wish-detail-modal";
+  modal.innerHTML = `
+    <div class="modal-box modal-box-large wish-detail-box" role="dialog" aria-modal="true" aria-labelledby="wishDetailTitle">
+      <h2 id="wishDetailTitle">詳細資訊</h2>
+      <div id="wishDetailContent" class="wish-detail-content"></div>
+      <div class="modal-actions">
+        <button class="cancel-btn" type="button" onclick="closeWishDetailModal()">關閉</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) closeWishDetailModal();
+  });
+
+  return modal;
+}
+
+function closeWishDetailModal() {
+  const modal = document.getElementById("wishDetailModal");
+  if (modal) modal.classList.remove("show");
+}
+
+function openWishDetailModal(groupKeysText) {
+  const selectedWishKeys = String(groupKeysText || "").split("||").filter(Boolean);
+  const keySet = new Set(selectedWishKeys);
+  const group = sortOldestFirst(wishes).filter(function (wish) {
+    return keySet.has(String(getWishKey(wish))) && wish.status !== "pending" && wish.status !== "done";
+  });
+
+  if (!group.length) {
+    alert("這個時段已經被接走或不存在了。");
+    renderAll();
+    return;
+  }
+
+  const firstWish = group[0];
+  const modal = ensureWishDetailModal();
+  const title = document.getElementById("wishDetailTitle");
+  const content = document.getElementById("wishDetailContent");
+  const timeGroups = groupWishesByExactTime(group);
+
+  if (title) title.textContent = `🌸 ${firstWish.flower || "花朵"}`;
+
+  if (content) {
+    content.innerHTML = `
+      <p class="wish-detail-summary">目前 ${group.length} 人許願</p>
+      ${timeGroups.map(function (timeGroup) {
+        const timeWishKeys = timeGroup.items.map(function (wish) { return getWishKey(wish); }).join("||");
+        const peopleHtml = timeGroup.items.map(function (wish) {
+          return `
+            <div class="wish-detail-person">
+              <p>👤 ${displayNameWithTagHtml(wish.nickname || "匿名許願者", wish.requesterPlatform || wish.platform)}</p>
+              <p>💬 ${escapeHtml(wish.message || "沒有留言")}</p>
+              ${wish.lastCancelReason || wish.cancelReason ? `<p class="hint cancel-reason">上次取消原因：${escapeHtml(wish.lastCancelReason || wish.cancelReason)}</p>` : ""}
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <section class="wish-time-group-detail">
+            <h3>🕒 ${escapeHtml(timeGroup.key)}｜${timeGroup.items.length}人許願</h3>
+            <div class="wish-detail-people">${peopleHtml}</div>
+            ${firstWish.isExample
+              ? `<button class="help-btn disabled-btn" type="button" disabled>範例卡不能接單</button>`
+              : `<button class="help-btn" type="button" data-wish-key="${escapeHtml(timeWishKeys)}">我可以幫忙</button>`}
+          </section>
+        `;
+      }).join("")}
+    `;
+  }
+
+  modal.classList.add("show");
+}
+
 function renderWishes() {
   removeExpiredWishes();
   const list = document.getElementById("wishList");
+  if (!list) return;
   list.innerHTML = "";
 
-  if (wishes.length === 0) {
+  const activeWishes = sortOldestFirst(wishes).filter(function (wish) {
+    return wish.status !== "pending" && wish.status !== "done";
+  });
+
+  if (activeWishes.length === 0) {
     list.innerHTML = '<div class="empty">目前沒有願望卡。</div>';
     return;
   }
 
-  sortOldestFirst(wishes).forEach(function (wish) {
-    const cardClass = wish.isExample ? "card example-card" : "card";
-    if (wish.status === "pending" || wish.status === "done") return;
+  const groupedWishes = groupWishesByFlower(activeWishes);
 
-    const wishKey = getWishKey(wish);
-    const canDelete = !wish.isExample && getCurrentNickname() && String(getCurrentNickname()).trim() === String(wish.nickname).trim();
-    const actionButton = wish.isExample
-      ? `<button class="help-btn disabled-btn" disabled>範例卡不能接單</button>`
-      : `
-          <div class="wish-actions">
-            <button class="help-btn" type="button" data-wish-key="${escapeHtml(wishKey)}">我可以幫忙</button>
-            ${canDelete ? `<button class="delete-btn" type="button" data-delete-wish="${escapeHtml(wishKey)}" aria-label="刪除自己的許願">🗑️ 刪除許願</button>` : ""}
-          </div>
-        `;
+  groupedWishes.forEach(function (group) {
+    const firstWish = group[0];
+    const cardClass = firstWish.isExample ? "card example-card" : "card";
+    const timeGroups = groupWishesByExactTime(group);
+    const groupWishKeys = group.map(function (wish) { return getWishKey(wish); }).join("||");
+    const groupCurrentlyAvailable = group.some(function (wish) {
+      return isTimeRangeCurrentlyAvailable(wish.timeRange);
+    });
+    const groupTimeRanges = timeGroups.map(function (timeGroup) { return timeGroup.key; }).join("、");
+    const timeListHtml = timeGroups.map(function (timeGroup) {
+      return `<li>${escapeHtml(timeGroup.key)}（${timeGroup.items.length}人）</li>`;
+    }).join("");
 
     list.innerHTML += `
-      <article class="${cardClass}">
-        <h3>🌸 ${escapeHtml(wish.flower)}</h3>
-        <p>👤 暱稱：${displayNameWithTagHtml(wish.nickname, wish.requesterPlatform || wish.platform)}</p>
-        <p>🕒 發願時間：${escapeHtml(wish.createdAt)}</p>
-        <p>🌙 可收花時間：${escapeHtml(wish.timeRange)}</p>
-        <p>💬 ${escapeHtml(wish.message)}</p>
-        ${wish.lastCancelReason || wish.cancelReason ? `<p class="hint cancel-reason">上次取消原因：${escapeHtml(wish.lastCancelReason || wish.cancelReason)}</p>` : ""}
-        ${actionButton}
+      <article class="${cardClass}" data-time-range="${escapeHtml(groupTimeRanges || firstWish.timeRange || "")}" data-currently-available="${groupCurrentlyAvailable ? "true" : "false"}">
+        <h3>🌸 ${escapeHtml(firstWish.flower)}</h3>
+        <p>目前 ${group.length} 人許願</p>
+        <div class="wish-time-summary">
+          <p>🕒 可採花時段</p>
+          <ul>${timeListHtml}</ul>
+        </div>
+        <div class="wish-actions merged-help-action">
+          <button class="detail-btn" type="button" data-detail-wish-key="${escapeHtml(groupWishKeys)}">詳細資訊</button>
+          ${group.some(function(wish){
+            return !wish.isExample && getCurrentNickname() && String(getCurrentNickname()).trim() === String(wish.nickname).trim();
+          }) ? `<button class="delete-btn outer-delete-btn" type="button" data-delete-group="${escapeHtml(groupWishKeys)}">刪除我的許願</button>` : ""}
+        </div>
       </article>
     `;
   });
 }
 
+function getPendingGroupKey(item) {
+  return [
+    String(item.flower || "").trim(),
+    normalizeWishTimeRange(item.timeRange),
+    String(item.farmer || item.acceptedBy || "").trim(),
+    String(item.acceptedAt || "").trim()
+  ].join("__");
+}
+
+function groupPendingOrders(pendingList) {
+  return groupByValue(pendingList, getPendingGroupKey).map(function (group) {
+    return group.items;
+  });
+}
+
 function renderPending() {
   const list = document.getElementById("pendingList");
+  if (!list) return;
   list.innerHTML = "";
 
   if (pending.length === 0) {
@@ -1385,21 +1720,29 @@ function renderPending() {
     return;
   }
 
-  sortOldestFirst(pending).forEach(function (item) {
-    const canComplete = isCurrentFarmer(item);
-    const pendingKey = escapeHtml(getWishKey(item));
+  const groupedPending = groupPendingOrders(sortOldestFirst(pending));
+
+  groupedPending.forEach(function (group) {
+    const firstItem = group[0];
+    const canComplete = group.every(function (item) { return isCurrentFarmer(item); });
+    const pendingKeys = group.map(function (item) { return getWishKey(item); }).join("||");
+    const safePendingKeys = escapeHtml(pendingKeys);
+    const requesterList = group.map(function (item) {
+      return `<li>${displayNameWithTagHtml(item.nickname || "匿名許願者", item.requesterPlatform || item.platform)}${item.message ? `｜${escapeHtml(item.message)}` : ""}</li>`;
+    }).join("");
     const actionButton = canComplete
-      ? `<div class="pending-actions"><button class="done-btn" type="button" data-pending-key="${pendingKey}">完成分享</button><button class="cancel-take-btn" type="button" data-pending-key="${pendingKey}">取消接單</button></div>`
+      ? `<div class="pending-actions"><button class="done-btn" type="button" data-pending-key="${safePendingKeys}">完成分享</button><button class="cancel-take-btn" type="button" data-pending-key="${safePendingKeys}">取消接單</button></div>`
       : `<button class="done-btn disabled-btn" type="button" disabled>等待花農完成分享</button>`;
 
     list.innerHTML += `
       <article class="card">
-        <h3>🌱 ${escapeHtml(item.flower)}</h3>
-        <p>👤 發願者：${displayNameWithTagHtml(item.nickname || "匿名許願者", item.requesterPlatform || item.platform)}</p>
-        <p>🕒 發願時間：${escapeHtml(item.createdAt || "未記錄")}</p>
-        <p>🌙 可收花時間：${escapeHtml(item.timeRange || "未設定")}</p>
-        <p>🌱 接單花農：${displayNameWithTagHtml(item.farmer || item.acceptedBy || "花農", item.farmerPlatform || item.acceptedByPlatform)}</p>
-        <p class="hint">狀態：花農已接單，待完成分享。</p>
+        <h3>🌱 ${escapeHtml(firstItem.flower)}</h3>
+        <p>🌙 可收花時間：${escapeHtml(firstItem.timeRange || "未設定")}｜${group.length}人</p>
+        <p>🌱 接單花農：${displayNameWithTagHtml(firstItem.farmer || firstItem.acceptedBy || "花農", firstItem.farmerPlatform || firstItem.acceptedByPlatform)}</p>
+        <div class="pending-requesters">
+          <p>👤 許願者：</p>
+          <ul>${requesterList}</ul>
+        </div>
         ${actionButton}
       </article>
     `;
@@ -1435,15 +1778,28 @@ function renderDone() {
         <h3>✨ ${escapeHtml(item.flower)}</h3>
         ${donePeopleHtml}
         <p>🌼 採收資訊：${escapeHtml(item.harvestInfo)}</p>
-        <p>📍 分享地點／座標：</p>
-        <pre class="coord-list" id="coord-${item.id}">${escapeHtml(item.location).replace(/\\n/g, "\n")}</pre>
+
+        ${(() => {
+          const coordId = `coord-${item.id}`;
+          const coordOpen = expandedCoordMap.get(coordId) === true;
+          return `
+            <button class="detail-btn toggle-coord-btn" type="button" data-target="${coordId}">
+              ${coordOpen ? "隱藏詳細座標" : "顯示詳細座標"}
+            </button>
+
+            <div id="${coordId}" style="display:${coordOpen ? "block" : "none"}; margin-top:10px;">
+              <p>📍 座標：</p>
+              <pre class="coord-list">${escapeHtml(item.location).replace(/\\n/g, "\n")}</pre>
+            </div>
+          `;
+        })()}
 
         <div class="done-actions">
           <button class="like-btn ${item.liked ? "liked" : ""}" type="button" data-done-key="${escapeHtml(doneKey)}">
             👍 ${item.likes}
           </button>
           <button class="copy-btn" type="button" data-done-key="${escapeHtml(doneKey)}">
-            快速複製整串座標
+            快速複製座標
           </button>
         </div>
 
@@ -1460,7 +1816,7 @@ setInterval(function () {
   renderDone();
   bindDynamicButtons();
   saveData();
-}, 1000);
+}, 3000);
 
 async function toggleLike(id) {
   const item = done.find(function (x) {
@@ -1499,6 +1855,50 @@ async function toggleLike(id) {
       alert("讚數同步失敗，請稍後再試。");
     }
   }
+}
+
+
+
+function copyHarvestInfo() {
+  const harvestInput = document.getElementById("harvestInfoInput");
+  const locationInput = document.getElementById("shareLocationInput");
+
+  const harvestInfo = harvestInput ? harvestInput.value.trim() : "";
+  const locationText = "https://zhizhi67742.github.io/pikmin-wish/";
+
+  let flowerName = "";
+
+  if (selectedPendingId === "__farmer_direct_share__") {
+    flowerName = document.getElementById("flowerInput")?.value?.trim() || "";
+  } else {
+    const selectedPendingKeys = String(selectedPendingId || "").split("||").filter(Boolean);
+    const target = pending.find(function (item) {
+      return selectedPendingKeys.includes(String(getWishKey(item)));
+    });
+
+    if (target) {
+      flowerName = target.flower || "";
+    }
+  }
+
+  const copyText = `${flowerName} / ${harvestInfo}\n-\n${locationText}`.trim();
+
+  if (!copyText) {
+    alert("沒有可複製的內容！");
+    return;
+  }
+
+  navigator.clipboard.writeText(copyText).then(function () {
+    alert("已複製！");
+  }).catch(function () {
+    const temp = document.createElement("textarea");
+    temp.value = copyText;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("已複製！");
+  });
 }
 
 function copyCoords(id) {
@@ -1874,17 +2274,25 @@ function isEndingSoon(targetTime) {
 }
 
 
+function isDemoWish(wish) {
+  if (!wish) return false;
+  return wish.isExample === true ||
+    wish.id === 999999 ||
+    wish.nickname === "範例玩家" ||
+    wish.nickname === "小芽";
+}
+
 function removeDemoWishesFromStorage() {
   wishes = wishes.filter(function (wish) {
-    return wish.nickname !== "小芽";
+    return !isDemoWish(wish);
   });
 
   pending = pending.filter(function (wish) {
-    return wish.nickname !== "小芽";
+    return !isDemoWish(wish);
   });
 
   done = done.filter(function (wish) {
-    return wish.nickname !== "小芽";
+    return !isDemoWish(wish);
   });
 
   safeSetLocalStorage("flowerWishWishes", JSON.stringify(wishes));
@@ -1896,7 +2304,7 @@ function removeDemoWishesFromStorage() {
 function removeExpiredWishes() {
   const now = Date.now();
   wishes = wishes.filter(function (wish) {
-    return wish.isExample || !wish.deleteAt || wish.deleteAt > now;
+    return !isDemoWish(wish) && (!wish.deleteAt || wish.deleteAt > now);
   });
 }
 
@@ -1961,23 +2369,6 @@ function loadData() {
   if (savedHistory) wishHistory = JSON.parse(savedHistory);
 
   removeDemoWishesFromStorage();
-
-  const hasExample = wishes.some(function (wish) {
-    return wish.isExample === true;
-  });
-
-  if (!hasExample) {
-    wishes.unshift({
-      id: 999999,
-      flower: "白勿忘草",
-      nickname: "範例玩家",
-      createdAt: "2026/05/23 22:45",
-      timeRange: "14:00 - 23:00",
-      deleteAt: Date.now() + (1000 * 60 * 60 * 3),
-      message: "謝謝花農",
-      isExample: true
-    });
-  }
 
 
   flowerDex = JSON.parse(JSON.stringify(DEFAULT_FLOWER_DEX));
@@ -2249,7 +2640,7 @@ async function startFirebaseSync() {
         ...docItem.data()
       };
 
-      if (locallyDeletedWishKeys.has(String(data.firebaseId || data.id || ""))) {
+      if (locallyDeletedWishKeys.has(String(data.firebaseId || data.id || "")) || isDemoWish(data)) {
         return;
       }
 
@@ -2293,6 +2684,12 @@ async function startFirebaseSync() {
       return;
     }
 
+    if (isLockedWishFlowerValue(flower)) {
+      warnLockedFlower();
+      resetFlowerPicker();
+      return;
+    }
+
     const canSubmitRepeatWish = await askRepeatWishIfNeeded(flower, nickname);
     if (!canSubmitRepeatWish) return;
 
@@ -2318,6 +2715,8 @@ async function startFirebaseSync() {
     };
 
     await addDoc(wishesRef, newWish);
+
+    alert("已成功送出許願 🌸");
 
     document.getElementById("flowerInput").value = "";
     if (document.getElementById("messageInput")) {
@@ -2564,12 +2963,59 @@ function getFieldValueFromCard(card, labels) {
   return "";
 }
 
+
+function parseTimeRangeToMinutes(timeRange) {
+  const text = String(timeRange || "");
+  const match = text.match(/(\d{1,2})\s*[:：]\s*(\d{2})\s*[-~～至到－—–]\s*(\d{1,2})\s*[:：]\s*(\d{2})/);
+  if (!match) return null;
+
+  const startHour = Number(match[1]);
+  const startMinute = Number(match[2]);
+  const endHour = Number(match[3]);
+  const endMinute = Number(match[4]);
+
+  if (startHour > 23 || endHour > 23 || startMinute > 59 || endMinute > 59) return null;
+
+  return {
+    start: startHour * 60 + startMinute,
+    end: endHour * 60 + endMinute
+  };
+}
+
+function isTimeRangeCurrentlyAvailable(timeRange) {
+  const range = parseTimeRangeToMinutes(timeRange);
+  if (!range) return false;
+
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+
+  // 一般區間：14:00 - 20:00
+  if (range.start <= range.end) {
+    return current >= range.start && current <= range.end;
+  }
+
+  // 跨日區間：22:00 - 02:00
+  return current >= range.start || current <= range.end;
+}
+
+function orderCardIsCurrentlyAvailable(card) {
+  if (!card) return false;
+  if (card.dataset.currentlyAvailable === "true") return true;
+  if (card.dataset.currentlyAvailable === "false") return false;
+  const timeRange = card.dataset.timeRange || getFieldValueFromCard(card, ["可收花時間：", "可收花時間", "可採花時間：", "可採花時間"]);
+  return isTimeRangeCurrentlyAvailable(timeRange);
+}
+
 function orderCardBelongsToMe(card, listId, currentName) {
   if (!card || !currentName) return false;
 
   const cleanName = normalizeOrderText(currentName);
 
   if (listId === "wishList") {
+    if (card.querySelector(".outer-delete-btn")) {
+      return true;
+    }
+
     const wishOwner = getFieldValueFromCard(card, ["許願者：", "許願者", "暱稱：", "暱稱"]);
     return normalizeOrderText(wishOwner).includes(cleanName);
   }
@@ -2603,6 +3049,26 @@ function applyOrderFilter(listId) {
     return;
   }
 
+  let shown = 0;
+
+  if (mode === "available" && listId === "wishList") {
+    cards.forEach(function (card) {
+      const ok = orderCardIsCurrentlyAvailable(card);
+      card.style.display = ok ? "" : "none";
+      if (ok) shown++;
+    });
+
+    if (shown === 0) {
+      const empty = document.createElement("div");
+      empty.className = "order-filter-empty";
+      empty.textContent = "目前沒有可接訂單。";
+      list.appendChild(empty);
+    }
+
+    if (typeof refreshCollapseHeights === "function") refreshCollapseHeights();
+    return;
+  }
+
   const currentName = getCurrentPikminUserName();
 
   if (!currentName) {
@@ -2617,7 +3083,6 @@ function applyOrderFilter(listId) {
     return;
   }
 
-  let shown = 0;
   cards.forEach(function (card) {
     const ok = orderCardBelongsToMe(card, listId, currentName);
     card.style.display = ok ? "" : "none";
@@ -2826,7 +3291,7 @@ window.updateCurrentNicknameBar = updateCurrentNicknameBar;
     if (input.dataset.deployDropdownFixed === "1") return;
     input.dataset.deployDropdownFixed = "1";
 
-    const defaultColors = ["白", "黃", "紅", "藍"];
+    const defaultColors = ["黃", "紅", "藍"];
 
     function findFlower(name) {
       const key = normalizeFlowerText(name);
@@ -2838,21 +3303,48 @@ window.updateCurrentNicknameBar = updateCurrentNicknameBar;
     function updateHiddenValue() {
       const name = input.value.trim();
       const color = colorSelect.value;
+      if (isLockedFlowerName(name)) {
+        hiddenInput.value = "";
+        return;
+      }
       hiddenInput.value = buildWishFlowerName(color, name);
     }
 
     function renderColors() {
       const current = colorSelect.value;
       const found = findFlower(input.value);
-      const colors = getWishColorOptions(found && Array.isArray(found.colors) && found.colors.length ? found.colors : defaultColors);
-      colorSelect.innerHTML = "";
-      colors.forEach(function (color) {
+      if (found && found.locked) {
+        colorSelect.innerHTML = "";
         const option = document.createElement("option");
-        option.value = color;
-        option.textContent = getWishColorLabel(color);
+        option.value = "";
+        option.textContent = "5/31 開放後才能選";
         colorSelect.appendChild(option);
-      });
-      if (colors.includes(current)) colorSelect.value = current;
+        hiddenInput.value = "";
+        return;
+      }
+      const baseFlowerColors = found && Array.isArray(found.colors) ? found.colors : [];
+      const colors = getWishColorOptions(baseFlowerColors.length ? baseFlowerColors : defaultColors);
+
+      colorSelect.innerHTML = "";
+
+      if (baseFlowerColors.length <= 1) {
+        colorSelect.style.display = "none";
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "單色花";
+        colorSelect.appendChild(option);
+      } else {
+        colorSelect.style.display = "";
+        colors.forEach(function (color) {
+          const option = document.createElement("option");
+          option.value = color;
+          option.textContent = getWishColorLabel(color);
+          colorSelect.appendChild(option);
+        });
+
+        if (colors.includes(current)) colorSelect.value = current;
+      }
+
       updateHiddenValue();
     }
 
@@ -2880,11 +3372,20 @@ window.updateCurrentNicknameBar = updateCurrentNicknameBar;
         flowers.forEach(function (flower) {
           const btn = document.createElement("button");
           btn.type = "button";
-          btn.className = "flower-combo-option";
+          btn.className = "flower-combo-option" + (flower.locked ? " is-disabled" : "");
           btn.textContent = flower.subtitle ? flower.name + "（" + flower.subtitle + "）" : flower.name;
+          if (flower.locked) {
+            btn.disabled = true;
+            btn.setAttribute("aria-disabled", "true");
+            btn.title = "5/31 才會開放，目前不能選擇";
+          }
           btn.addEventListener("mousedown", function (event) {
             event.preventDefault();
             event.stopPropagation();
+            if (flower.locked) {
+              warnLockedFlower();
+              return;
+            }
             input.value = flower.name;
             renderColors();
             closeDropdown();
@@ -2925,3 +3426,79 @@ window.updateCurrentNicknameBar = updateCurrentNicknameBar;
   window.addEventListener("load", installFlowerDeployDropdownFix);
   setTimeout(installFlowerDeployDropdownFix, 300);
 })();
+
+
+  document.addEventListener("click", function (event) {
+    const deleteGroupButton = event.target.closest("[data-delete-group]");
+    if (deleteGroupButton) {
+      const keys = String(deleteGroupButton.getAttribute("data-delete-group") || "").split("||").filter(Boolean);
+      const nickname = String(getCurrentNickname() || "").trim();
+
+      const myWishes = wishes.filter(function(wish){
+        return keys.includes(String(getWishKey(wish))) &&
+          String(wish.nickname || "").trim() === nickname &&
+          wish.status !== "pending" &&
+          wish.status !== "done";
+      });
+
+      if (!myWishes.length) {
+        alert("找不到你的許願單。");
+        return;
+      }
+
+      myWishes.forEach(function(wish){
+        deleteWish(getWishKey(wish));
+      });
+    }
+  });
+
+
+
+// ===== 惡意刷單自動清理 =====
+async function cleanupSpamWishes() {
+  try {
+    if (typeof db === "undefined") return;
+
+    const snapshot = await db.ref("wishes").once("value");
+    const data = snapshot.val();
+
+    if (!data) return;
+
+    const groups = {};
+
+    Object.keys(data).forEach(function(key) {
+      const wish = data[key];
+      if (!wish) return;
+
+      const groupKey = [
+        wish.flower || "",
+        wish.color || "",
+        wish.nickname || ""
+      ].join("_");
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+
+      groups[groupKey].push({
+        key: key,
+        wish: wish
+      });
+    });
+
+    for (const groupKey in groups) {
+      if (groups[groupKey].length > 50) {
+        console.log("偵測到異常刷單，自動清理：", groupKey);
+
+        for (const item of groups[groupKey]) {
+          await db.ref("wishes/" + item.key).remove();
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Spam cleanup failed:", e);
+  }
+}
+
+setTimeout(cleanupSpamWishes, 3000);
+// ===== 惡意刷單自動清理 END =====
